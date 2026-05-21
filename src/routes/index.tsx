@@ -61,7 +61,7 @@ function Header() {
     >
       <div className="mx-auto flex h-[60px] max-w-[1100px] items-center justify-between px-6 md:h-[72px]">
         <a href="#top" aria-label="MediPass — Inicio">
-          <img src="/medipass-logo.png" alt="MediPass" className="w-auto" style={{ height: 32 }} />
+          <img src={`${import.meta.env.BASE_URL}medipass-logo.png`} alt="MediPass" className="w-auto" style={{ height: 32 }} />
         </a>
         <a
           href="#cotizar"
