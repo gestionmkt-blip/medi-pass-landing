@@ -44,6 +44,7 @@ const html = `<!DOCTYPE html>
 ${cssFiles.map((f) => `    <link rel="stylesheet" crossorigin href="${base}assets/${f}" />`).join("\n")}
   </head>
   <body>
+    <script>window.$_TSR={buffer:[],router:{matches:[]},h:function(){}};</script>
     <script type="module" crossorigin src="${base}assets/${jsEntry}"></script>
   </body>
 </html>
