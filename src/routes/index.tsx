@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import { Reveal } from "@/components/medipass/Reveal";
 
@@ -63,13 +63,13 @@ function Header() {
         <a href="#top" aria-label="MediPass — Inicio">
           <img src={`${import.meta.env.BASE_URL}medipass-logo.png`} alt="MediPass" className="w-auto" style={{ height: 32 }} />
         </a>
-        <a
-          href="#cotizar"
+        <button
+          onClick={() => document.getElementById('cotizar')?.scrollIntoView({ behavior: 'smooth' })}
           className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform active:scale-95"
           style={{ background: CORAL }}
         >
           Cotizar
-        </a>
+        </button>
       </div>
     </header>
   );
@@ -118,13 +118,13 @@ function Hero() {
         </Reveal>
         <Reveal delay={240}>
           <div className="mt-10 flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-6">
-            <a
-              href="#cotizar"
+            <button
+              onClick={() => document.getElementById('cotizar')?.scrollIntoView({ behavior: 'smooth' })}
               className="inline-flex w-full items-center justify-center rounded-full px-7 text-base font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95 md:w-auto"
               style={{ background: CORAL, height: 56 }}
             >
               Quiero mi cotización gratuita
-            </a>
+            </button>
             <a href="#planes" className="text-base font-semibold underline-offset-4 hover:underline" style={{ color: TEAL }}>
               Ver planes →
             </a>
@@ -154,7 +154,7 @@ function Badge({ children }: { children: React.ReactNode }) {
 function Authority() {
   const metrics = [
     { value: "15", suffix: "+", label: "años ayudando a empresas" },
-    { value: "1,000", suffix: "+", label: "familias respaldadas" },
+    { value: "1,000", suffix: "+", label: "colaboradores respaldados" },
     { value: "48 hrs", suffix: "", label: "para activar tu equipo" },
     { value: "Nacional", suffix: "", label: "cobertura en México" },
   ];
@@ -277,6 +277,7 @@ type Plan = {
   description: string;
   accent: string;
   badge?: string;
+  badgeColor?: string;
   highlights: string[];
   benefitGroups: BenefitGroup[];
 };
@@ -291,7 +292,7 @@ function PlanCard({ plan }: { plan: Plan }) {
       {plan.badge && (
         <span
           className="absolute -top-3 left-8 rounded-full px-3 py-1 text-xs font-semibold text-white"
-          style={{ background: TEAL, letterSpacing: "0.04em" }}
+          style={{ background: plan.badgeColor ?? TEAL, letterSpacing: "0.04em" }}
         >
           {plan.badge}
         </span>
@@ -432,7 +433,8 @@ function Plans() {
       price: "$890 MXN / año por persona",
       description: "Para colaboradores que quieres respaldar con una membresía más completa.",
       accent: TEAL,
-      badge: "Más completo individual",
+      badge: "⭐ Más popular",
+      badgeColor: "#E8532A",
       highlights: [
         "Orientación médica y videoconsulta",
         "Limpieza dental y check up",
@@ -669,48 +671,7 @@ function Process() {
   );
 }
 
-function Field({ label, children, id }: { label: string; children: React.ReactNode; id?: string }) {
-  return (
-    <label htmlFor={id} className="block">
-      <span className="mb-2 block text-sm font-semibold" style={{ color: TEAL }}>{label}</span>
-      {children}
-    </label>
-  );
-}
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  height: 52,
-  background: "transparent",
-  border: `1.5px solid ${LINE}`,
-  borderRadius: 10,
-  padding: "0 14px",
-  fontSize: 16,
-  color: INK,
-  outline: "none",
-  fontFamily: "var(--font-sans)",
-};
-
 function LeadForm() {
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({
-    nombre: "",
-    empresa: "",
-    cargo: "",
-    whatsapp: "",
-    colaboradores: "",
-    beneficio: "",
-  });
-
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (
-      !form.nombre.trim() || !form.empresa.trim() || !form.cargo.trim() ||
-      !form.whatsapp.trim() || !form.colaboradores || !form.beneficio
-    ) return;
-    setSubmitted(true);
-  };
-
   return (
     <section id="cotizar" className="px-6 py-[80px] md:py-[120px]">
       <div className="mx-auto max-w-[820px]">
@@ -727,85 +688,73 @@ function LeadForm() {
         </Reveal>
 
         <Reveal delay={240}>
-          {submitted ? (
-            <div className="mt-12 rounded-2xl p-8 text-center md:p-12" style={{ border: `2px solid ${TEAL}` }}>
-              <h3 className="font-extrabold tracking-tight" style={{ color: TEAL, fontSize: 28, letterSpacing: "-0.01em" }}>
-                ¡Listo! Te contactamos en menos de 24 horas. 🙌
-              </h3>
-              <p className="mt-4" style={{ color: INK_SOFT, fontSize: 17, lineHeight: 1.6 }}>
-                Solo para darte tu cotización — sin compromisos.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={onSubmit} className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="md:col-span-2">
-                <Field label="Nombre completo" id="nombre">
-                  <input id="nombre" required style={inputStyle} value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} maxLength={120} />
-                </Field>
-              </div>
-              <Field label="Empresa" id="empresa">
-                <input id="empresa" required style={inputStyle} value={form.empresa} onChange={(e) => setForm({ ...form, empresa: e.target.value })} maxLength={120} />
-              </Field>
-              <Field label="Cargo" id="cargo">
-                <input id="cargo" required style={inputStyle} value={form.cargo} onChange={(e) => setForm({ ...form, cargo: e.target.value })} maxLength={80} />
-              </Field>
-              <Field label="WhatsApp" id="whatsapp">
-                <input id="whatsapp" required type="tel" inputMode="tel" style={inputStyle} value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} maxLength={20} />
-              </Field>
-              <Field label="Número de colaboradores" id="colaboradores">
-                <select id="colaboradores" required style={inputStyle} value={form.colaboradores} onChange={(e) => setForm({ ...form, colaboradores: e.target.value })}>
-                  <option value="">Selecciona…</option>
-                  <option>1–5</option>
-                  <option>6–15</option>
-                  <option>16–30</option>
-                  <option>31–50</option>
-                  <option>51–100</option>
-                  <option>Más de 100</option>
-                </select>
-              </Field>
+          <div className="mt-12 flex flex-col gap-4">
+            <p style={{ color: INK_SOFT, fontSize: 15, lineHeight: 1.65 }}>
+              Agenda una llamada de 20 minutos con un asesor. Sin compromiso —
+              solo para entender qué necesita tu empresa y armarte una propuesta.
+            </p>
+            <a
+              href="TU_LINK_DE_CALENDLY_AQUI"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center rounded-full px-6 font-semibold text-white transition-transform hover:-translate-y-0.5 active:scale-95"
+              style={{ background: CORAL, height: 56, fontSize: 18 }}
+            >
+              Agendar llamada gratuita
+            </a>
+            <p className="text-center text-xs" style={{ color: "#777", lineHeight: 1.5 }}>
+              MediPass no es una aseguradora. Los servicios se brindan a través de proveedores en convenio.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 
-              <div className="md:col-span-2">
-                <span className="mb-3 block text-sm font-semibold" style={{ color: TEAL }}>
-                  ¿Tu empresa actualmente tiene algún beneficio de salud para sus colaboradores?
-                </span>
-                <div className="space-y-2">
-                  {[
-                    "Sí, tenemos algo pero queremos mejorar",
-                    "No tenemos nada actualmente",
-                    "Lo estoy evaluando por primera vez",
-                  ].map((opt) => (
-                    <label key={opt} className="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3" style={{ border: `1.5px solid ${form.beneficio === opt ? CORAL : LINE}` }}>
-                      <input
-                        type="radio"
-                        name="beneficio"
-                        value={opt}
-                        checked={form.beneficio === opt}
-                        onChange={() => setForm({ ...form, beneficio: opt })}
-                        required
-                        className="accent-[#EA6B48]"
-                        style={{ width: 18, height: 18 }}
-                      />
-                      <span style={{ color: INK, fontSize: 16 }}>{opt}</span>
-                    </label>
-                  ))}
+function Testimonials() {
+  const items = [
+    {
+      quote: "Desde que tenemos MediPass, nuestros colaboradores ya no faltan días completos por algo menor. La orientación 24/7 les da certeza.",
+      name: "[Nombre]",
+      role: "Director de RRHH",
+      company: "[Empresa]",
+    },
+    {
+      quote: "Lo que más valoro es que no es un seguro complicado. Se activó en 2 días y mis empleados lo usan de verdad.",
+      name: "[Nombre]",
+      role: "CEO",
+      company: "[Empresa]",
+    },
+    {
+      quote: "Teníamos mucho ausentismo. Con MediPass bajamos las ausencias sin aumentar el presupuesto de beneficios.",
+      name: "[Nombre]",
+      role: "Gerente General",
+      company: "[Empresa]",
+    },
+  ];
+  return (
+    <section className="px-6 py-[80px] md:py-[120px]">
+      <div className="mx-auto max-w-[1100px]">
+        <Reveal><SectionLabel>Lo que dicen</SectionLabel></Reveal>
+        <Reveal delay={80}>
+          <h2 className="font-extrabold tracking-tight" style={H2_STYLE}>
+            Empresas que ya tienen a su equipo respaldado.
+          </h2>
+        </Reveal>
+        <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3">
+          {items.map((t, i) => (
+            <Reveal key={i} delay={i * 80}>
+              <div className="rounded-2xl p-5" style={{ border: `1px solid ${LINE}` }}>
+                <p className="mb-4" style={{ color: INK, fontSize: 15, lineHeight: 1.65 }}>"{t.quote}"</p>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: TEAL }}>{t.name}</p>
+                  <p className="text-xs" style={{ color: INK_SOFT }}>{t.role} · {t.company}</p>
                 </div>
               </div>
-
-              <div className="md:col-span-2">
-                <button
-                  type="submit"
-                  className="w-full rounded-full px-7 font-semibold text-white transition-transform hover:-translate-y-0.5 active:scale-95"
-                  style={{ background: CORAL, height: 56, fontSize: 18 }}
-                >
-                  Quiero mi cotización gratuita
-                </button>
-                <p className="mt-4 text-center text-sm" style={{ color: "#777", lineHeight: 1.5 }}>
-                  MediPass no es una aseguradora. Los servicios se brindan a través de proveedores en convenio.
-                </p>
-              </div>
-            </form>
-          )}
-        </Reveal>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -836,6 +785,9 @@ function FAQ() {
     { q: "¿Cómo se activa para mis colaboradores?", a: "Una vez que contratas, el proceso de activación es inmediato. Cada colaborador recibe su acceso y puede empezar a usar los beneficios el mismo día." },
     { q: "¿Tiene cobertura en todo México?", a: "Sí, cobertura nacional a través de nuestra red de proveedores en convenio. Algunos servicios presenciales tienen mayor disponibilidad en ciudades principales." },
     { q: "¿Qué pasa si quiero cancelar?", a: "Sin permanencia forzada. Si por cualquier motivo no podemos brindarte un servicio incluido, te reembolsamos el monto correspondiente conforme a nuestros términos y condiciones." },
+    { q: "¿Qué pasa si un colaborador deja la empresa?", a: "Puedes dar de baja esa membresía y asignarla a un nuevo colaborador, o simplemente reducir el número de personas en tu siguiente renovación anual." },
+    { q: "¿Puedo cambiar el número de colaboradores después de contratar?", a: "Sí. Puedes agregar colaboradores en cualquier momento. Las bajas se aplican en la siguiente renovación anual." },
+    { q: "¿Cómo administro el plan para mi equipo?", a: "Te damos acceso a un panel donde puedes ver quiénes están activos, agregar personas y gestionar tu cuenta. Además tienes un asesor asignado para cualquier duda operativa." },
   ];
   const [open, setOpen] = useState<number | null>(0);
   return (
@@ -905,6 +857,16 @@ function MediPassLanding() {
         <Authority />
         <Problem />
         <WhatIs />
+        <div className="px-6 pb-10 flex justify-center">
+          <button
+            onClick={() => document.getElementById('cotizar')?.scrollIntoView({ behavior: 'smooth' })}
+            className="w-full max-w-xs rounded-full px-6 font-semibold text-white transition-transform hover:-translate-y-0.5 active:scale-95"
+            style={{ background: CORAL, height: 56, fontSize: 16 }}
+          >
+            Quiero mi cotización gratuita
+          </button>
+        </div>
+        <Testimonials />
         <Plans />
         <WhatChanges />
         <Process />
