@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
 });
 
 const CORAL = "#EA6B48";
-const TEAL = "#1B5157";
+const TEAL = "#000000";
 const INK = "#1a1a1a";
 const INK_SOFT = "#444444";
 const LINE = "#e8e8e8";
@@ -153,10 +153,10 @@ function Badge({ children }: { children: React.ReactNode }) {
 
 function Authority() {
   const metrics = [
-    { value: "15", suffix: "+", label: "Años en el mercado" },
-    { value: "1,000", suffix: "+", label: "Familias respaldadas" },
-    { value: "2009", suffix: "", label: "Operando desde" },
-    { value: "Nacional", suffix: "", label: "Cobertura en México" },
+    { value: "15", suffix: "+", label: "años ayudando a empresas" },
+    { value: "1,000", suffix: "+", label: "familias respaldadas" },
+    { value: "48 hrs", suffix: "", label: "para activar tu equipo" },
+    { value: "Nacional", suffix: "", label: "cobertura en México" },
   ];
 
   return (
@@ -898,7 +898,7 @@ function Footer() {
 
 function MediPassLanding() {
   return (
-    <div className="min-h-screen bg-white" style={{ color: INK }}>
+    <div className="min-h-screen" style={{ color: INK }}>
       <Header />
       <main>
         <Hero />

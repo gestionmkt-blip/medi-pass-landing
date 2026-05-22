@@ -68,7 +68,7 @@
 
   /* MediPass brand */
   --mp-coral: #EA6B48;
-  --mp-teal: #1B5157;
+  --mp-teal: #000000;
   --mp-teal-soft: #2A6F76;
   --mp-blue: #B1D6FB;
   --mp-yellow: #E5CF5A;
@@ -153,6 +153,7 @@
 
   body {
     background-color: #ffffff;
+    background-image: linear-gradient(to bottom, rgba(219,236,235,0.12) 0%, rgba(177,214,251,0.13) 100%);
     color: var(--mp-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
