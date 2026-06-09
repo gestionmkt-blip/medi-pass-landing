@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "MediPass — Respaldo de salud para tu equipo" },
-      { name: "description", content: "Membresía de salud para empresas en Mérida y todo México. Orientación médica 24/7, videoconsultas y médico a domicilio desde menos de $30 al mes por persona." },
+      { name: "description", content: "Membresía de salud para empresas en Mérida y todo México. Orientación médica 24/7, videoconsultas y médico a domicilio desde $450 al año por persona." },
     ],
   }),
 });
@@ -68,7 +68,7 @@ function Header() {
           className="inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform active:scale-95"
           style={{ background: CORAL }}
         >
-          Cotizar
+          Quiero mi cotización
         </button>
       </div>
     </header>
@@ -113,7 +113,7 @@ function Hero() {
         </Reveal>
         <Reveal delay={160}>
           <p className="mt-8 max-w-[720px]" style={{ color: INK_SOFT, fontSize: 18, lineHeight: 1.7 }}>
-            Cuando alguien de tu equipo se enferma, no tienes que improvisar. MediPass da a tus colaboradores orientación médica 24/7, videoconsultas y médico a domicilio — desde menos de $30 al mes por persona.
+            Cuando alguien de tu equipo se enferma, no tienes que improvisar. MediPass da a tus colaboradores orientación médica 24/7, videoconsultas y médico a domicilio — desde $450 al año por persona.
           </p>
         </Reveal>
         <Reveal delay={240}>
@@ -123,7 +123,7 @@ function Hero() {
               className="inline-flex w-full items-center justify-center rounded-full px-7 text-base font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 active:scale-95 md:w-auto"
               style={{ background: CORAL, height: 56 }}
             >
-              Quiero mi cotización gratuita
+              Quiero mi cotización
             </button>
             <a href="#planes" className="text-base font-semibold underline-offset-4 hover:underline" style={{ color: TEAL }}>
               Ver planes →
@@ -133,7 +133,7 @@ function Hero() {
         <Reveal delay={320}>
           <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm" style={{ color: INK_SOFT }}>
             <Badge>Cobertura nacional</Badge>
-            <Badge>Activación en 24 hrs</Badge>
+            <Badge>Activación en 48 hrs</Badge>
             <Badge>Sin permanencia forzada</Badge>
           </div>
         </Reveal>
@@ -153,7 +153,7 @@ function Badge({ children }: { children: React.ReactNode }) {
 
 function Authority() {
   const metrics = [
-    { value: "15", suffix: "+", label: "años ayudando a empresas" },
+    { value: "15", suffix: "+", label: "años en el sector salud" },
     { value: "1,000", suffix: "+", label: "colaboradores respaldados" },
     { value: "48 hrs", suffix: "", label: "para activar tu equipo" },
     { value: "Nacional", suffix: "", label: "cobertura en México" },
@@ -579,7 +579,7 @@ function Plans() {
               className="mt-6 inline-flex items-center justify-center rounded-full px-7 text-base font-semibold text-white transition-transform hover:-translate-y-0.5 active:scale-95"
               style={{ background: CORAL, height: 52 }}
             >
-              Cotizar precio para mi empresa
+              Quiero mi cotización
             </a>
             <p className="mt-8 text-xs" style={{ color: "#999", lineHeight: 1.6 }}>
               Los precios mostrados son precios base anuales con IVA incluido. Los beneficios están sujetos a condiciones, disponibilidad, ciudad, proveedores en convenio y plan contratado. MediPass no es una aseguradora.
@@ -595,7 +595,7 @@ function WhatChanges() {
   const blocks = [
     { headline: "Menos ausencias", body: "Una orientación médica a tiempo evita que una molestia menor se convierta en días de baja." },
     { headline: "Decisiones más rápidas", body: "Tu equipo sabe a dónde acudir. Tú dejas de ser el intermediario de sus problemas de salud." },
-    { headline: "Desde $30 al mes", body: "Por persona. Sin los costos ni la burocracia de un seguro médico corporativo.", highlightFirst: true },
+    { headline: "Desde $450 al año", body: "Por persona, una sola vez al año. Sin los costos ni la burocracia de un seguro médico corporativo.", highlightFirst: true },
   ];
   return (
     <section className="px-6 py-[80px] md:py-[120px]">
@@ -631,7 +631,7 @@ function Process() {
   const steps = [
     { n: "01", title: "Solicitas tu cotización", text: "Cuéntanos cuántos colaboradores tienes. Te armamos una propuesta en menos de 24 horas." },
     { n: "02", title: "Revisamos juntos tu propuesta", text: "Un asesor te explica qué plan se ajusta mejor a tu empresa y responde todas tus dudas." },
-    { n: "03", title: "Tu equipo activa su membresía", text: "Activación inmediata. Sin trámites complicados. Sin esperar semanas." },
+    { n: "03", title: "Tu equipo activa su membresía", text: "Activación en 48 horas. Sin trámites complicados. Sin esperar semanas." },
   ];
   return (
     <section className="px-6 py-[80px] md:py-[120px]">
@@ -683,16 +683,12 @@ function LeadForm() {
         </Reveal>
         <Reveal delay={160}>
           <p className="mt-6" style={{ color: INK_SOFT, fontSize: 18, lineHeight: 1.7 }}>
-            Déjanos tus datos y un asesor te contacta en menos de 24 horas. Solo para darte tu cotización — sin compromisos.
+            Agenda una llamada de 20 minutos con un asesor. Sin compromiso — solo para entender qué necesita tu empresa y enviarte una propuesta con precio.
           </p>
         </Reveal>
 
         <Reveal delay={240}>
           <div className="mt-12 flex flex-col gap-4">
-            <p style={{ color: INK_SOFT, fontSize: 15, lineHeight: 1.65 }}>
-              Agenda una llamada de 20 minutos con un asesor. Sin compromiso —
-              solo para entender qué necesita tu empresa y armarte una propuesta.
-            </p>
             <a
               href="TU_LINK_DE_CALENDLY_AQUI"
               target="_blank"
@@ -818,7 +814,7 @@ function Footer() {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:items-start">
           <div>
             <div className="font-extrabold tracking-tight" style={{ color: TEAL, fontSize: 26 }}>MediPass</div>
-            <p className="mt-2 text-sm" style={{ color: INK_SOFT }}>Contigo en cada paso</p>
+            <p className="mt-2 text-sm" style={{ color: INK_SOFT }}>Respaldo de salud para tu equipo</p>
           </div>
           <nav className="flex flex-wrap items-center gap-x-6 gap-y-3 md:justify-center">
             <a href="#planes" className="text-sm font-medium hover:underline" style={{ color: INK }}>Membresías</a>
@@ -866,7 +862,7 @@ function MediPassLanding() {
             Quiero mi cotización gratuita
           </button>
         </div>
-        <Testimonials />
+        {/* <Testimonials /> oculto hasta tener testimonios reales */}
         <Plans />
         <WhatChanges />
         <Process />
