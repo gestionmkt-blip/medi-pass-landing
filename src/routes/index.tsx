@@ -32,7 +32,7 @@ const schema = z.object({
   puesto: z.string().min(2, "Escribe tu puesto"),
   whatsapp: z.string().min(10, "Escribe tu número de WhatsApp"),
   correo: z.string().email("Escribe un correo válido"),
-  colaboradores: z.string().min(1, "Indica el número de colaboradores"),
+  colaboradores: z.coerce.number().min(1, "Indica el número de colaboradores"),
   ciudad: z.string().min(2, "Escribe tu ciudad"),
   seguro: z.enum(["si", "no", "no_se"] as const, {
     errorMap: () => ({ message: "Elige una opción" }),
@@ -57,11 +57,13 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold" style={{ color: "#444" }}>
-        {label}
+      <label className="block">
+        <span className="mb-1.5 block text-xs font-semibold" style={{ color: "#444" }}>
+          {label}
+        </span>
+        {children}
       </label>
-      {children}
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {error && <p role="alert" className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
   );
 }
