@@ -20,12 +20,13 @@ export const Route = createFileRoute("/")({
 });
 
 const CORAL = "#EA6B48";
+const BG_DARK = "#111";
 
 function MediPassLanding() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
-    <div className="min-h-screen" style={{ background: "#111" }}>
+    <div id="top" className="min-h-screen" style={{ background: BG_DARK }}>
       <Nav />
       <main>
         {submitted ? (
@@ -48,7 +49,7 @@ function Nav() {
   return (
     <header
       className="sticky top-0 z-40"
-      style={{ background: "#111", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      style={{ background: BG_DARK, borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
       <div className="mx-auto flex h-16 max-w-2xl items-center justify-between px-5">
         <a href="#top" aria-label="MediPass inicio">
@@ -62,7 +63,8 @@ function Nav() {
           onClick={() =>
             document.getElementById("formulario")?.scrollIntoView({ behavior: "smooth" })
           }
-          className="rounded-full px-5 py-2.5 text-sm font-bold text-white transition-transform active:scale-95"
+          type="button"
+          className="rounded-full px-5 py-2.5 text-sm font-bold text-white transition-transform hover:opacity-90 active:scale-95"
           style={{ background: CORAL }}
         >
           Cotización gratis
