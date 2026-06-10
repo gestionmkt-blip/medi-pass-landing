@@ -81,7 +81,6 @@ function MediPassLanding() {
 
   return (
     <div id="top" className="min-h-screen" style={{ background: BG_DARK }}>
-      <Nav />
       <main>
         {submitted ? (
           <ThankYou />
@@ -89,6 +88,7 @@ function MediPassLanding() {
           <>
             <HeroSection />
             <FormSection onSubmit={() => setSubmitted(true)} />
+            <FaqSection />
             <TrustSignals />
           </>
         )}
@@ -131,19 +131,6 @@ function HeroSection() {
   return (
     <section className="px-5 pb-8 pt-10 text-center" style={{ background: BG_DARK }}>
       <div className="mx-auto max-w-xl">
-        <Reveal>
-          <span
-            className="inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest"
-            style={{
-              background: "rgba(234,107,72,0.12)",
-              color: CORAL,
-              border: "1px solid rgba(234,107,72,0.25)",
-            }}
-          >
-            Para dueños de empresa
-          </span>
-        </Reveal>
-
         <Reveal delay={80}>
           <h1
             className="mt-5 font-black leading-tight tracking-tight text-white"
@@ -494,6 +481,89 @@ function ThankYou() {
     </section>
   );
 }
+const FAQS = [
+  {
+    q: "¿Pregunta frecuente 1?",
+    a: "Respuesta placeholder. Aquí irá la respuesta real.",
+  },
+  {
+    q: "¿Pregunta frecuente 2?",
+    a: "Respuesta placeholder. Aquí irá la respuesta real.",
+  },
+  {
+    q: "¿Pregunta frecuente 3?",
+    a: "Respuesta placeholder. Aquí irá la respuesta real.",
+  },
+  {
+    q: "¿Pregunta frecuente 4?",
+    a: "Respuesta placeholder. Aquí irá la respuesta real.",
+  },
+  {
+    q: "¿Pregunta frecuente 5?",
+    a: "Respuesta placeholder. Aquí irá la respuesta real.",
+  },
+] as const;
+
+function FaqSection() {
+  const [open, setOpen] = useState<number | null>(null);
+
+  return (
+    <section className="px-5 py-12" style={{ background: BG_DARK }}>
+      <div className="mx-auto max-w-lg">
+        <Reveal>
+          <h2
+            className="mb-8 font-black tracking-tight text-white"
+            style={{ fontSize: "clamp(22px, 5vw, 28px)" }}
+          >
+            Preguntas frecuentes
+          </h2>
+        </Reveal>
+
+        <div className="space-y-2">
+          {FAQS.map((faq, i) => (
+            <Reveal key={i} delay={i * 60}>
+              <div
+                className="overflow-hidden rounded-xl"
+                style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors"
+                  style={{
+                    background: open === i ? "rgba(234,107,72,0.07)" : "rgba(255,255,255,0.03)",
+                  }}
+                >
+                  <span className="pr-4 text-sm font-semibold text-white">{faq.q}</span>
+                  <span
+                    className="flex-shrink-0 text-lg transition-transform"
+                    style={{
+                      color: CORAL,
+                      transform: open === i ? "rotate(45deg)" : "rotate(0deg)",
+                    }}
+                    aria-hidden="true"
+                  >
+                    +
+                  </span>
+                </button>
+
+                {open === i && (
+                  <div
+                    className="px-5 pb-5 pt-1 text-sm leading-relaxed"
+                    style={{ color: TEXT_MUTED }}
+                  >
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function TrustSignals() {
   const items = [
     "Cobertura nacional",
