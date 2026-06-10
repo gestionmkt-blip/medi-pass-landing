@@ -606,6 +606,27 @@ function FaqSection() {
   );
 }
 
+function ProgressBar({ step, total }: { step: number; total: number }) {
+  return (
+    <div className="mb-5 flex gap-1.5">
+      {Array.from({ length: total }).map((_, i) => (
+        <div
+          key={i}
+          className="h-1 flex-1 rounded-full transition-all duration-300"
+          style={{
+            background:
+              i < step
+                ? CORAL
+                : i === step
+                  ? `${CORAL}99`
+                  : "rgba(255,255,255,0.1)",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 function TrustSignals() {
   const items = [
     "Cobertura nacional",
