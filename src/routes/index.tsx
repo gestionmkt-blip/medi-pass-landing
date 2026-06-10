@@ -68,6 +68,12 @@ function Field({
   );
 }
 
+const CALL_EXPECTATIONS = [
+  "Entender el tamaño y necesidades de tu equipo",
+  "Explicarte qué plan se adapta mejor a tu empresa",
+  "Enviarte una propuesta con precio exacto al terminar",
+] as const;
+
 function MediPassLanding() {
   const [submitted, setSubmitted] = useState(false);
 
@@ -322,6 +328,157 @@ function FormSection({ onSubmit }: { onSubmit: () => void }) {
     </section>
   );
 }
-function ThankYou() { return null; }
+function ThankYou() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <section className="px-5 py-12" style={{ background: BG_DARK }}>
+      <div className="mx-auto max-w-lg text-center">
+        <Reveal>
+          <div className="mb-4 text-5xl" aria-hidden="true">🎉</div>
+        </Reveal>
+        <Reveal delay={80}>
+          <h2
+            className="font-black leading-tight text-white"
+            style={{ fontSize: "clamp(22px, 5vw, 28px)" }}
+          >
+            ¡Listo! Ya recibimos tu solicitud
+          </h2>
+        </Reveal>
+        <Reveal delay={140}>
+          <p className="mt-3 text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
+            El siguiente paso es agendar una llamada de 20 minutos con un miembro de nuestro
+            equipo.
+          </p>
+        </Reveal>
+
+        {/* Expectativas de la llamada */}
+        <Reveal delay={200}>
+          <div className="mt-8 text-left">
+            <p
+              className="mb-3 text-xs font-bold uppercase tracking-widest"
+              style={{ color: CORAL }}
+            >
+              En la llamada vamos a:
+            </p>
+            <div
+              className="overflow-hidden rounded-xl"
+              style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              {CALL_EXPECTATIONS.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 px-4 py-3"
+                  style={{
+                    borderBottom:
+                      i < CALL_EXPECTATIONS.length - 1
+                        ? "1px solid rgba(255,255,255,0.06)"
+                        : undefined,
+                  }}
+                >
+                  <div
+                    className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-black text-white"
+                    style={{ background: CORAL }}
+                  >
+                    {i + 1}
+                  </div>
+                  <p className="text-sm leading-snug" style={{ color: "#ccc" }}>
+                    {item}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Badge */}
+        <Reveal delay={260}>
+          <div className="mt-5">
+            <span
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold"
+              style={{
+                background: "rgba(234,107,72,0.1)",
+                color: CORAL,
+                border: "1px solid rgba(234,107,72,0.25)",
+              }}
+            >
+              📅 Llamada de 20 minutos · Gratis · Sin compromiso
+            </span>
+          </div>
+        </Reveal>
+
+        {/* Checkbox de compromiso */}
+        <Reveal delay={320}>
+          <label
+            className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-left transition-colors"
+            style={{
+              borderColor: checked ? CORAL : "rgba(255,255,255,0.1)",
+              background: checked ? "rgba(234,107,72,0.08)" : "rgba(255,255,255,0.04)",
+            }}
+          >
+            <div
+              className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 transition-all"
+              style={{
+                borderColor: checked ? CORAL : "#555",
+                background: checked ? CORAL : "transparent",
+              }}
+              aria-hidden="true"
+            >
+              {checked && (
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+            </div>
+            <input
+              type="checkbox"
+              className="sr-only"
+              checked={checked}
+              onChange={(e) => setChecked(e.target.checked)}
+            />
+            <span className="text-xs leading-relaxed" style={{ color: "#bbb" }}>
+              Confirmo que soy responsable de tomar o proponer decisiones de beneficios en mi
+              empresa, y que quiero recibir una propuesta real para mis colaboradores.
+            </span>
+          </label>
+        </Reveal>
+
+        {/* Botón Calendly — deshabilitado hasta que el checkbox esté palomeado */}
+        <Reveal delay={380}>
+          <a
+            href={checked ? "https://calendly.com/TU_LINK_AQUI" : undefined}
+            onClick={!checked ? (e) => e.preventDefault() : undefined}
+            target={checked ? "_blank" : undefined}
+            rel="noopener noreferrer"
+            className="mt-4 block w-full rounded-full py-4 text-center text-base font-black text-white transition-all"
+            style={{
+              background: checked ? CORAL : "#2a2a2a",
+              color: checked ? "white" : "#555",
+              cursor: checked ? "pointer" : "not-allowed",
+            }}
+            aria-disabled={!checked}
+          >
+            Agendar mi llamada →
+          </a>
+          <p className="mt-2 text-xs" style={{ color: checked ? "#777" : "#444" }}>
+            {checked
+              ? "Todo listo — selecciona tu horario"
+              : "Confirma el recuadro de arriba para continuar"}
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 function TrustSignals() { return null; }
 function PageFooter() { return null; }
