@@ -460,7 +460,7 @@ function ThankYou() {
             onClick={!checked ? (e) => e.preventDefault() : undefined}
             target={checked ? "_blank" : undefined}
             rel="noopener noreferrer"
-            className="mt-4 block w-full rounded-full py-4 text-center text-base font-black text-white transition-all"
+            className={`mt-4 block w-full rounded-full py-4 text-center text-base font-black text-white transition-all${checked ? " hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(234,107,72,0.35)]" : ""}`}
             style={{
               background: checked ? CORAL : "#2a2a2a",
               color: checked ? "white" : "#555",
@@ -474,6 +474,13 @@ function ThankYou() {
             {checked
               ? "Todo listo — selecciona tu horario"
               : "Confirma el recuadro de arriba para continuar"}
+          </p>
+        </Reveal>
+
+        <Reveal delay={440}>
+          <hr className="my-6" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
+          <p className="text-xs leading-relaxed" style={{ color: "#444" }}>
+            MediPass no es una aseguradora. Los servicios se brindan a través de proveedores en convenio.
           </p>
         </Reveal>
       </div>
