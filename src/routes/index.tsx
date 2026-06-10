@@ -494,5 +494,33 @@ function ThankYou() {
     </section>
   );
 }
-function TrustSignals() { return null; }
-function PageFooter() { return null; }
+function TrustSignals() {
+  const items = [
+    "Cobertura nacional",
+    "Activación en 48 hrs",
+    "Sin permanencia forzada",
+  ] as const;
+
+  return (
+    <section className="px-5 py-6" style={{ background: "#f7f7f7", borderTop: "1px solid #ececec" }}>
+      <div className="mx-auto flex max-w-lg flex-wrap justify-center gap-x-6 gap-y-2">
+        {items.map((item) => (
+          <span key={item} className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: "#555" }}>
+            <span className="h-1.5 w-1.5 rounded-full flex-shrink-0" style={{ background: "#EA6B48" }} />
+            {item}
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+function PageFooter() {
+  return (
+    <footer className="px-5 py-8 text-center" style={{ background: "#111", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <p className="text-sm font-black text-white">MediPass</p>
+      <p className="mt-2 text-xs leading-relaxed" style={{ color: "#555" }}>
+        Los servicios se brindan a través de proveedores en convenio. © 2026 MediPass
+      </p>
+    </footer>
+  );
+}
