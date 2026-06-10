@@ -73,7 +73,76 @@ function Nav() {
     </header>
   );
 }
-function HeroSection() { return null; }
+function HeroSection() {
+  return (
+    <section className="px-5 pb-8 pt-10 text-center" style={{ background: BG_DARK }}>
+      <div className="mx-auto max-w-xl">
+        <Reveal>
+          <span
+            className="inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest"
+            style={{
+              background: "rgba(234,107,72,0.12)",
+              color: CORAL,
+              border: "1px solid rgba(234,107,72,0.25)",
+            }}
+          >
+            Para dueños de empresa
+          </span>
+        </Reveal>
+
+        <Reveal delay={80}>
+          <h1
+            className="mt-5 font-black leading-tight tracking-tight text-white"
+            style={{ fontSize: "clamp(26px, 7vw, 40px)" }}
+          >
+            Protege la salud de tu equipo{" "}
+            <span style={{ color: CORAL }}>sin pagar un seguro caro</span>
+          </h1>
+        </Reveal>
+
+        <Reveal delay={160}>
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed" style={{ color: "#aaa" }}>
+            Mira el video y descubre cómo más de 1,000 colaboradores ya tienen respaldo médico
+            desde $450 al año.
+          </p>
+        </Reveal>
+
+        <Reveal delay={240}>
+          <div className="mx-auto mt-7">
+            {/* VSL placeholder — reemplazar con <iframe> de YouTube/Vimeo cuando esté listo */}
+            <div
+              className="relative w-full overflow-hidden rounded-xl"
+              style={{ aspectRatio: "16/9", background: "#000", border: "1px solid #2a2a2a" }}
+            >
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div
+                  className="flex h-16 w-16 items-center justify-center rounded-full"
+                  style={{
+                    background: CORAL,
+                    boxShadow: "0 0 0 16px rgba(234,107,72,0.12)",
+                  }}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    style={{ marginLeft: 3 }}
+                  >
+                    <polygon points="5,3 19,12 5,21" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <p className="mt-2 text-xs" style={{ color: "#555" }}>
+              ⏱ Video de 3 minutos — míralo completo antes de cotizar
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 function FormSection(_: { onSubmit: () => void }) { return null; }
 function ThankYou() { return null; }
 function TrustSignals() { return null; }
