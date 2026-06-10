@@ -724,6 +724,155 @@ function ContactStep({
   );
 }
 
+function QuizSection({ onSubmit }: { onSubmit: () => void }) {
+  const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState<1 | -1>(1);
+  const [answers, setAnswers] = useState<QuizAnswers>({
+    colaboradores: "",
+    rol: "",
+    salud: "",
+    nombre: "",
+    correo: "",
+    whatsapp: "",
+  });
+  const [errors, setErrors] = useState<Partial<Record<keyof QuizAnswers, string>>>({});
+
+  const TOTAL_STEPS = 4;
+  const isSelectionStep = step < 3;
+  const currentConfig = isSelectionStep ? QUIZ_STEPS[step as 0 | 1 | 2] : null;
+  const currentValue = isSelectionStep ? answers[QUIZ_STEPS[step as 0 | 1 | 2].key] : "";
+
+  const canAdvance = isSelectionStep
+    ? !!currentValue
+    : answers.nombre.trim().length >= 2 &&
+      /\S+@\S+\.\S+/.test(answers.correo) &&
+      answers.whatsapp.trim().length >= 10;
+
+  const goNext = () => {
+    setDirection(1);
+    setStep((s) => s + 1);
+  };
+
+  const goBack = () => {
+    setDirection(-1);
+    setStep((s) => s - 1);
+  };
+
+  const handleSubmit = () => {
+    const newErrors: Partial<Record<keyof QuizAnswers, string>> = {};
+    if (answers.nombre.trim().length < 2) newErrors.nombre = "Escribe tu nombre";
+    if (!/\S+@\S+\.\S+/.test(answers.correo)) newErrors.correo = "Escribe un correo válido";
+    if (answers.whatsapp.trim().length < 10) newErrors.whatsapp = "Escribe tu número de WhatsApp";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    onSubmit();
+  };
+
+  const slideClass = direction === 1 ? "quiz-slide-right" : "quiz-slide-left";
+
+  return (
+    <section id="formulario" className="px-5 py-10" style={{ background: BG_DARK }}>
+      <div className="mx-auto max-w-lg">
+        <Reveal>
+          <span
+            className="mb-2 inline-block text-xs font-bold uppercase tracking-widest"
+            style={{ color: CORAL }}
+          >
+            Cotización gratuita
+          </span>
+        </Reveal>
+        <Reveal delay={80}>
+          <h2
+            className="font-black tracking-tight text-white"
+            style={{ fontSize: "clamp(22px, 5vw, 28px)" }}
+          >
+            Solicita tu propuesta personalizada
+          </h2>
+        </Reveal>
+        <Reveal delay={120}>
+          <p className="mt-2 mb-6 text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
+            Sin costo ni compromiso. Un asesor te contacta en menos de 24 hrs.
+          </p>
+        </Reveal>
+
+        <Reveal delay={180}>
+          <div
+            className="overflow-hidden rounded-2xl p-6"
+            style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)" }}
+          >
+            <ProgressBar step={step} total={TOTAL_STEPS} />
+
+            <div key={step} className={slideClass}>
+              {currentConfig ? (
+                <SelectionStep
+                  config={currentConfig}
+                  value={currentValue}
+                  onChange={(val) =>
+                    setAnswers((a) => ({ ...a, [currentConfig.key]: val }))
+                  }
+                />
+              ) : (
+                <ContactStep
+                  answers={answers}
+                  errors={errors}
+                  onChange={(field, val) => {
+                    setAnswers((a) => ({ ...a, [field]: val }));
+                    if (errors[field]) setErrors((e) => ({ ...e, [field]: undefined }));
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="mt-6 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={goBack}
+                className="text-sm transition-opacity hover:opacity-80"
+                style={{
+                  color: "#666",
+                  visibility: step === 0 ? "hidden" : "visible",
+                }}
+              >
+                ← Atrás
+              </button>
+
+              {isSelectionStep ? (
+                <button
+                  type="button"
+                  onClick={goNext}
+                  disabled={!canAdvance}
+                  className="rounded-full px-6 py-2.5 text-sm font-bold text-white transition-all active:scale-95"
+                  style={{
+                    background: canAdvance ? CORAL : "#2a2a2a",
+                    opacity: canAdvance ? 1 : 0.45,
+                    cursor: canAdvance ? "pointer" : "default",
+                  }}
+                >
+                  Siguiente →
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="rounded-full px-6 py-2.5 text-sm font-bold text-white transition-all active:scale-95"
+                  style={{ background: CORAL }}
+                >
+                  Enviar →
+                </button>
+              )}
+            </div>
+          </div>
+          <p className="mt-3 text-center text-xs" style={{ color: "#555" }}>
+            Sin spam. Solo te contactamos para enviarte tu propuesta.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function TrustSignals() {
   const items = [
     "Cobertura nacional",
