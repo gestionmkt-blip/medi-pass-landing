@@ -21,6 +21,9 @@ export const Route = createFileRoute("/")({
 
 const CORAL = "#EA6B48";
 const BG_DARK = "#111";
+const TEXT_MUTED = "#aaa";
+const VSL_BG = "#000";
+const VSL_BORDER = "#2a2a2a";
 
 function MediPassLanding() {
   const [submitted, setSubmitted] = useState(false);
@@ -101,7 +104,7 @@ function HeroSection() {
         </Reveal>
 
         <Reveal delay={160}>
-          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed" style={{ color: "#aaa" }}>
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
             Mira el video y descubre cómo más de 1,000 colaboradores ya tienen respaldo médico
             desde $450 al año.
           </p>
@@ -112,7 +115,7 @@ function HeroSection() {
             {/* VSL placeholder — reemplazar con <iframe> de YouTube/Vimeo cuando esté listo */}
             <div
               className="relative w-full overflow-hidden rounded-xl"
-              style={{ aspectRatio: "16/9", background: "#000", border: "1px solid #2a2a2a" }}
+              style={{ aspectRatio: "16/9", background: VSL_BG, border: `1px solid ${VSL_BORDER}` }}
             >
               <div className="absolute inset-0 flex items-center justify-center">
                 <div
@@ -127,7 +130,9 @@ function HeroSection() {
                     height="24"
                     viewBox="0 0 24 24"
                     fill="white"
-                    style={{ marginLeft: 3 }}
+                    aria-hidden="true"
+                    focusable="false"
+                    style={{ marginLeft: "3px" }}
                   >
                     <polygon points="5,3 19,12 5,21" />
                   </svg>
