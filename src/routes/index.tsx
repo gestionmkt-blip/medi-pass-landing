@@ -25,6 +25,8 @@ const BG_DARK = "#111";
 const TEXT_MUTED = "#aaa";
 const VSL_BG = "#000";
 const VSL_BORDER = "#2a2a2a";
+// TODO deploy-blocker: reemplazar con URL real antes de publicar
+const CALENDLY_URL = "https://calendly.com/TU_LINK_AQUI";
 
 const schema = z.object({
   nombre: z.string().min(2, "Escribe tu nombre"),
@@ -367,7 +369,7 @@ function ThankYou() {
             >
               {CALL_EXPECTATIONS.map((item, i) => (
                 <div
-                  key={i}
+                  key={item}
                   className="flex items-start gap-3 px-4 py-3"
                   style={{
                     borderBottom:
@@ -410,7 +412,7 @@ function ThankYou() {
         {/* Checkbox de compromiso */}
         <Reveal delay={320}>
           <label
-            className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-left transition-colors"
+            className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border p-4 text-left transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#EA6B48]"
             style={{
               borderColor: checked ? CORAL : "rgba(255,255,255,0.1)",
               background: checked ? "rgba(234,107,72,0.08)" : "rgba(255,255,255,0.04)",
@@ -455,21 +457,26 @@ function ThankYou() {
 
         {/* Botón Calendly — deshabilitado hasta que el checkbox esté palomeado */}
         <Reveal delay={380}>
-          <a
-            href={checked ? "https://calendly.com/TU_LINK_AQUI" : undefined}
-            onClick={!checked ? (e) => e.preventDefault() : undefined}
-            target={checked ? "_blank" : undefined}
-            rel="noopener noreferrer"
-            className={`mt-4 block w-full rounded-full py-4 text-center text-base font-black text-white transition-all${checked ? " hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(234,107,72,0.35)]" : ""}`}
-            style={{
-              background: checked ? CORAL : "#2a2a2a",
-              color: checked ? "white" : "#555",
-              cursor: checked ? "pointer" : "not-allowed",
-            }}
-            aria-disabled={!checked}
-          >
-            Agendar mi llamada →
-          </a>
+          {checked ? (
+            <a
+              href={CALENDLY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 block w-full rounded-full py-4 text-center text-base font-black text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(234,107,72,0.35)]"
+              style={{ background: CORAL }}
+            >
+              Agendar mi llamada →
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="mt-4 block w-full rounded-full py-4 text-center text-base font-black transition-all"
+              style={{ background: "#2a2a2a", color: "#555", cursor: "not-allowed" }}
+            >
+              Agendar mi llamada →
+            </button>
+          )}
           <p className="mt-2 text-xs" style={{ color: checked ? "#777" : "#444" }}>
             {checked
               ? "Todo listo — selecciona tu horario"
