@@ -44,7 +44,33 @@ function MediPassLanding() {
 }
 
 // ── Componentes (se definen en tareas siguientes) ──────────────────────────
-function Nav() { return null; }
+function Nav() {
+  return (
+    <header
+      className="sticky top-0 z-40"
+      style={{ background: "#111", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+    >
+      <div className="mx-auto flex h-16 max-w-2xl items-center justify-between px-5">
+        <a href="#top" aria-label="MediPass inicio">
+          <img
+            src={`${import.meta.env.BASE_URL}medipass-logo.png`}
+            alt="MediPass"
+            style={{ height: 30 }}
+          />
+        </a>
+        <button
+          onClick={() =>
+            document.getElementById("formulario")?.scrollIntoView({ behavior: "smooth" })
+          }
+          className="rounded-full px-5 py-2.5 text-sm font-bold text-white transition-transform active:scale-95"
+          style={{ background: CORAL }}
+        >
+          Cotización gratis
+        </button>
+      </div>
+    </header>
+  );
+}
 function HeroSection() { return null; }
 function FormSection(_: { onSubmit: () => void }) { return null; }
 function ThankYou() { return null; }
