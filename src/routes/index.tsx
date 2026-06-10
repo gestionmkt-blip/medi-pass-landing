@@ -28,6 +28,48 @@ const VSL_BORDER = "#2a2a2a";
 // TODO deploy-blocker: reemplazar con URL real antes de publicar
 const CALENDLY_URL = "https://calendly.com/TU_LINK_AQUI";
 
+type QuizAnswers = {
+  colaboradores: string;
+  rol: string;
+  salud: string;
+  nombre: string;
+  correo: string;
+  whatsapp: string;
+};
+
+const QUIZ_STEPS = [
+  {
+    key: "colaboradores" as const,
+    question: "¿Cuántos colaboradores tiene tu empresa?",
+    options: ["1 – 10", "11 – 30", "31 – 100", "100+"] as const,
+    grid: true,
+  },
+  {
+    key: "rol" as const,
+    question: "¿Cuál es tu rol en la empresa?",
+    options: [
+      "Dueño / CEO / Director General",
+      "Director / Gerente de RRHH",
+      "Gerente o Coordinador",
+      "Otro — tomo decisiones de beneficios",
+    ] as const,
+    grid: false,
+  },
+  {
+    key: "salud" as const,
+    question: "¿Hoy tienen algún beneficio de salud para su equipo?",
+    options: [
+      "Sí — seguro médico privado",
+      "Sí — solo IMSS / ISSSTE",
+      "No tenemos nada",
+      "No estoy seguro",
+    ] as const,
+    grid: false,
+  },
+] as const;
+
+type SelectionStepConfig = (typeof QUIZ_STEPS)[number];
+
 const schema = z.object({
   nombre: z.string().min(2, "Escribe tu nombre"),
   empresa: z.string().min(2, "Escribe el nombre de tu empresa"),
