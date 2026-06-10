@@ -189,3 +189,16 @@
     transform: translateY(0);
   }
 }
+
+@keyframes quizSlideRight {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes quizSlideLeft {
+  from { transform: translateX(-40px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+.quiz-slide-right { animation: quizSlideRight 280ms ease-out both; }
+.quiz-slide-left  { animation: quizSlideLeft  280ms ease-out both; }
