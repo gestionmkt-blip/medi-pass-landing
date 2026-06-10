@@ -87,8 +87,8 @@ function MediPassLanding() {
         ) : (
           <>
             <HeroSection />
-            <FormSection onSubmit={() => setSubmitted(true)} />
             <FaqSection />
+            <FormSection onSubmit={() => setSubmitted(true)} />
             <TrustSignals />
           </>
         )}
