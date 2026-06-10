@@ -829,6 +829,8 @@ function QuizSection({ onSubmit }: { onSubmit: () => void }) {
               <button
                 type="button"
                 onClick={goBack}
+                disabled={step === 0}
+                aria-hidden={step === 0}
                 className="text-sm transition-opacity hover:opacity-80"
                 style={{
                   color: "#666",
@@ -856,8 +858,13 @@ function QuizSection({ onSubmit }: { onSubmit: () => void }) {
                 <button
                   type="button"
                   onClick={handleSubmit}
+                  disabled={!canAdvance}
                   className="rounded-full px-6 py-2.5 text-sm font-bold text-white transition-all active:scale-95"
-                  style={{ background: CORAL }}
+                  style={{
+                    background: canAdvance ? CORAL : "#2a2a2a",
+                    opacity: canAdvance ? 1 : 0.45,
+                    cursor: canAdvance ? "pointer" : "default",
+                  }}
                 >
                   Enviar →
                 </button>
