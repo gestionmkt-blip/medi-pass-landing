@@ -627,6 +627,93 @@ function ProgressBar({ step, total }: { step: number; total: number }) {
   );
 }
 
+function SelectionStep({
+  config,
+  value,
+  onChange,
+}: {
+  config: SelectionStepConfig;
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  return (
+    <div>
+      <p
+        className="mb-4 font-black text-white"
+        style={{ fontSize: "clamp(15px, 3.5vw, 17px)", lineHeight: 1.35 }}
+      >
+        {config.question}
+      </p>
+      <div className={config.grid ? "grid grid-cols-2 gap-2" : "flex flex-col gap-2"}>
+        {config.options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onChange(opt)}
+            className="rounded-xl px-4 py-3 text-left text-sm font-medium transition-all active:scale-[0.98]"
+            style={{
+              background: value === opt ? CORAL : "rgba(255,255,255,0.05)",
+              border: `1px solid ${value === opt ? CORAL : "rgba(255,255,255,0.1)"}`,
+              color: value === opt ? "white" : "#ccc",
+            }}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ContactStep({
+  answers,
+  errors,
+  onChange,
+}: {
+  answers: QuizAnswers;
+  errors: Partial<Record<keyof QuizAnswers, string>>;
+  onChange: (field: keyof QuizAnswers, val: string) => void;
+}) {
+  const fields = [
+    { key: "nombre" as const, placeholder: "Nombre completo", type: "text" },
+    { key: "correo" as const, placeholder: "tu@empresa.com", type: "email" },
+    { key: "whatsapp" as const, placeholder: "+52 55 1234 5678 (WhatsApp)", type: "tel" },
+  ];
+
+  return (
+    <div>
+      <p
+        className="mb-4 font-black text-white"
+        style={{ fontSize: "clamp(15px, 3.5vw, 17px)", lineHeight: 1.35 }}
+      >
+        ¡Ya casi! ¿A dónde te enviamos la propuesta?
+      </p>
+      <div className="flex flex-col gap-3">
+        {fields.map(({ key, placeholder, type }) => (
+          <div key={key}>
+            <input
+              type={type}
+              placeholder={placeholder}
+              value={answers[key]}
+              onChange={(e) => onChange(key, e.target.value)}
+              className="w-full rounded-xl px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-[#555]"
+              style={{
+                background: errors[key] ? "rgba(239,68,68,0.08)" : "rgba(255,255,255,0.06)",
+                border: `1px solid ${errors[key] ? "#ef4444" : "rgba(255,255,255,0.12)"}`,
+              }}
+            />
+            {errors[key] && (
+              <p role="alert" className="mt-1 text-xs text-red-400">
+                {errors[key]}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function TrustSignals() {
   const items = [
     "Cobertura nacional",
