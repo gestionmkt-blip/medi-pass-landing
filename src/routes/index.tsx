@@ -608,7 +608,14 @@ function FaqSection() {
 
 function ProgressBar({ step, total }: { step: number; total: number }) {
   return (
-    <div className="mb-5 flex gap-1.5">
+    <div
+      role="progressbar"
+      aria-valuenow={step + 1}
+      aria-valuemin={1}
+      aria-valuemax={total}
+      aria-label="Progreso del cuestionario"
+      className="mb-5 flex gap-1.5"
+    >
       {Array.from({ length: total }).map((_, i) => (
         <div
           key={i}
@@ -650,6 +657,7 @@ function SelectionStep({
             key={opt}
             type="button"
             onClick={() => onChange(opt)}
+            aria-pressed={value === opt}
             className="rounded-xl px-4 py-3 text-left text-sm font-medium transition-all active:scale-[0.98]"
             style={{
               background: value === opt ? CORAL : "rgba(255,255,255,0.05)",
@@ -691,7 +699,9 @@ function ContactStep({
       <div className="flex flex-col gap-3">
         {fields.map(({ key, placeholder, type }) => (
           <div key={key}>
+            <label htmlFor={key} className="sr-only">{placeholder}</label>
             <input
+              id={key}
               type={type}
               placeholder={placeholder}
               value={answers[key]}
