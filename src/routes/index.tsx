@@ -1,9 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import type { ReactNode } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Reveal } from "@/components/medipass/Reveal";
 
 export const Route = createFileRoute("/")({
@@ -70,47 +66,6 @@ const QUIZ_STEPS = [
 
 type SelectionStepConfig = (typeof QUIZ_STEPS)[number];
 
-const schema = z.object({
-  nombre: z.string().min(2, "Escribe tu nombre"),
-  empresa: z.string().min(2, "Escribe el nombre de tu empresa"),
-  puesto: z.string().min(2, "Escribe tu puesto"),
-  whatsapp: z.string().min(10, "Escribe tu número de WhatsApp"),
-  correo: z.string().email("Escribe un correo válido"),
-  colaboradores: z.coerce.number().min(1, "Indica el número de colaboradores"),
-  ciudad: z.string().min(2, "Escribe tu ciudad"),
-  seguro: z.enum(["si", "no", "no_se"] as const, {
-    errorMap: () => ({ message: "Elige una opción" }),
-  }),
-});
-
-type FormData = z.infer<typeof schema>;
-
-const inputCls = (hasError: boolean) =>
-  `w-full rounded-lg border px-4 py-3 text-sm text-black outline-none transition-colors focus:border-[#EA6B48] ${
-    hasError ? "border-red-400 bg-red-50" : "border-[#e8e8e8] bg-[#f7f7f7]"
-  }`;
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <label className="block">
-        <span className="mb-1.5 block text-xs font-semibold" style={{ color: "#444" }}>
-          {label}
-        </span>
-        {children}
-      </label>
-      {error && <p role="alert" className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
-  );
-}
 
 const CALL_EXPECTATIONS = [
   "Entender el tamaño y necesidades de tu equipo",
@@ -130,7 +85,7 @@ function MediPassLanding() {
           <>
             <HeroSection />
             <FaqSection />
-            <FormSection onSubmit={() => setSubmitted(true)} />
+            <QuizSection onSubmit={() => setSubmitted(true)} />
             <TrustSignals />
           </>
         )}
@@ -228,137 +183,7 @@ function HeroSection() {
     </section>
   );
 }
-function FormSection({ onSubmit }: { onSubmit: () => void }) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  const submit = (_data: FormData) => {
-    // TODO: aquí va la integración con backend/CRM cuando esté listo
-    onSubmit();
-  };
-
-  return (
-    <section id="formulario" className="bg-white px-5 py-10">
-      <div className="mx-auto max-w-lg">
-        <Reveal>
-          <span
-            className="mb-2 inline-block text-xs font-bold uppercase tracking-widest"
-            style={{ color: CORAL }}
-          >
-            Cotización gratuita
-          </span>
-        </Reveal>
-        <Reveal delay={80}>
-          <h2
-            className="font-black tracking-tight text-black"
-            style={{ fontSize: "clamp(22px, 5vw, 28px)" }}
-          >
-            Solicita tu propuesta personalizada
-          </h2>
-        </Reveal>
-        <Reveal delay={120}>
-          <p className="mt-2 text-sm leading-relaxed" style={{ color: "#666" }}>
-            Sin costo ni compromiso. Un asesor te contacta en menos de 24 hrs.
-          </p>
-        </Reveal>
-
-        <Reveal delay={180}>
-          <form onSubmit={handleSubmit(submit)} className="mt-6 space-y-3" noValidate>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field label="Nombre completo" error={errors.nombre?.message}>
-                <input
-                  {...register("nombre")}
-                  placeholder="Tu nombre"
-                  className={inputCls(!!errors.nombre)}
-                />
-              </Field>
-              <Field label="Empresa" error={errors.empresa?.message}>
-                <input
-                  {...register("empresa")}
-                  placeholder="Nombre de tu empresa"
-                  className={inputCls(!!errors.empresa)}
-                />
-              </Field>
-            </div>
-
-            <Field label="Puesto" error={errors.puesto?.message}>
-              <input
-                {...register("puesto")}
-                placeholder="CEO, Director de RRHH, Gerente…"
-                className={inputCls(!!errors.puesto)}
-              />
-            </Field>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field label="WhatsApp" error={errors.whatsapp?.message}>
-                <input
-                  {...register("whatsapp")}
-                  placeholder="+52 55 1234 5678"
-                  type="tel"
-                  className={inputCls(!!errors.whatsapp)}
-                />
-              </Field>
-              <Field label="Correo electrónico" error={errors.correo?.message}>
-                <input
-                  {...register("correo")}
-                  placeholder="tu@empresa.com"
-                  type="email"
-                  className={inputCls(!!errors.correo)}
-                />
-              </Field>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field label="No. de colaboradores" error={errors.colaboradores?.message}>
-                <input
-                  {...register("colaboradores")}
-                  placeholder="Ej: 15"
-                  type="number"
-                  min="1"
-                  className={inputCls(!!errors.colaboradores)}
-                />
-              </Field>
-              <Field label="Ciudad" error={errors.ciudad?.message}>
-                <input
-                  {...register("ciudad")}
-                  placeholder="Mérida, CDMX…"
-                  className={inputCls(!!errors.ciudad)}
-                />
-              </Field>
-            </div>
-
-            <Field
-              label="¿Tienen algún seguro o beneficio de salud?"
-              error={errors.seguro?.message}
-            >
-              <select {...register("seguro")} className={inputCls(!!errors.seguro)}>
-                <option value="">Elige una opción</option>
-                <option value="si">Sí</option>
-                <option value="no">No</option>
-                <option value="no_se">No sé</option>
-              </select>
-            </Field>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="mt-4 w-full rounded-full py-4 text-base font-black text-white transition-transform active:scale-95 disabled:opacity-60"
-              style={{ background: CORAL }}
-            >
-              {isSubmitting ? "Enviando…" : "Quiero mi cotización →"}
-            </button>
-            <p className="text-center text-xs" style={{ color: "#bbb" }}>
-              Sin spam. Solo te contactamos para enviarte tu propuesta.
-            </p>
-          </form>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
 function ThankYou() {
   const [checked, setChecked] = useState(false);
 
