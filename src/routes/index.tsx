@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Reveal } from "@/components/medipass/Reveal";
+import { submitLeadFn, parseColaboradores, mapSalud } from "@/lib/actions/submitLead";
 
 export const Route = createFileRoute("/")({
   component: MediPassLanding,
@@ -32,6 +34,7 @@ type QuizAnswers = {
   colaboradores: string;
   rol: string;
   salud: string;
+  empresa: string;
   nombre: string;
   correo: string;
   whatsapp: string;
@@ -568,6 +571,7 @@ function ContactStep({
   onChange: (field: keyof QuizAnswers, val: string) => void;
 }) {
   const fields = [
+    { key: "empresa" as const, placeholder: "Nombre de tu empresa", type: "text" },
     { key: "nombre" as const, placeholder: "Nombre completo", type: "text" },
     { key: "correo" as const, placeholder: "tu@empresa.com", type: "email" },
     { key: "whatsapp" as const, placeholder: "+52 55 1234 5678 (WhatsApp)", type: "tel" },
@@ -616,10 +620,12 @@ function QuizSection({ onSubmit }: { onSubmit: () => void }) {
     colaboradores: "",
     rol: "",
     salud: "",
+    empresa: "",
     nombre: "",
     correo: "",
     whatsapp: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof QuizAnswers, string>>>({});
 
   const TOTAL_STEPS = 4;
@@ -627,11 +633,14 @@ function QuizSection({ onSubmit }: { onSubmit: () => void }) {
   const currentConfig = isSelectionStep ? QUIZ_STEPS[step as 0 | 1 | 2] : null;
   const currentValue = isSelectionStep ? answers[QUIZ_STEPS[step as 0 | 1 | 2].key] : "";
 
-  const canAdvance = isSelectionStep
-    ? !!currentValue
-    : answers.nombre.trim().length >= 2 &&
-      /\S+@\S+\.\S+/.test(answers.correo) &&
-      answers.whatsapp.trim().length >= 10;
+  const canAdvance =
+    !isSubmitting &&
+    (isSelectionStep
+      ? !!currentValue
+      : answers.empresa.trim().length >= 1 &&
+        answers.nombre.trim().length >= 2 &&
+        /\S+@\S+\.\S+/.test(answers.correo) &&
+        answers.whatsapp.trim().length >= 10);
 
   const goNext = () => {
     setDirection(1);
@@ -643,8 +652,9 @@ function QuizSection({ onSubmit }: { onSubmit: () => void }) {
     setStep((s) => s - 1);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors: Partial<Record<keyof QuizAnswers, string>> = {};
+    if (!answers.empresa.trim()) newErrors.empresa = "Escribe el nombre de tu empresa";
     if (answers.nombre.trim().length < 2) newErrors.nombre = "Escribe tu nombre";
     if (!/\S+@\S+\.\S+/.test(answers.correo)) newErrors.correo = "Escribe un correo válido";
     if (answers.whatsapp.trim().length < 10) newErrors.whatsapp = "Escribe tu número de WhatsApp";
@@ -652,7 +662,33 @@ function QuizSection({ onSubmit }: { onSubmit: () => void }) {
       setErrors(newErrors);
       return;
     }
-    onSubmit();
+
+    setIsSubmitting(true);
+    try {
+      await submitLeadFn({
+        data: {
+          empresa: answers.empresa.trim(),
+          contacto: answers.nombre.trim() || undefined,
+          puesto: answers.rol || undefined,
+          correo: answers.correo.trim(),
+          whatsapp: answers.whatsapp.trim() || undefined,
+          colaboradores: parseColaboradores(answers.colaboradores),
+          seguroActual: mapSalud(answers.salud),
+        },
+      });
+
+      onSubmit(); // muestra pantalla ThankYou mientras redirige
+
+      // TODO: reemplazar CALENDLY_URL con la URL real de tu Calendly antes de publicar
+      const target = new URL(CALENDLY_URL);
+      target.searchParams.set("name", answers.nombre.trim());
+      target.searchParams.set("email", answers.correo.trim());
+      window.location.href = target.toString();
+    } catch {
+      toast.error("No pudimos guardar tus datos, intenta de nuevo.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const slideClass = direction === 1 ? "quiz-slide-right" : "quiz-slide-left";
@@ -743,15 +779,15 @@ function QuizSection({ onSubmit }: { onSubmit: () => void }) {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={!canAdvance}
+                  disabled={!canAdvance || isSubmitting}
                   className="rounded-full px-6 py-2.5 text-sm font-bold text-white transition-all active:scale-95"
                   style={{
-                    background: canAdvance ? CORAL : "#2a2a2a",
-                    opacity: canAdvance ? 1 : 0.45,
-                    cursor: canAdvance ? "pointer" : "default",
+                    background: canAdvance && !isSubmitting ? CORAL : "#2a2a2a",
+                    opacity: canAdvance && !isSubmitting ? 1 : 0.45,
+                    cursor: canAdvance && !isSubmitting ? "pointer" : "default",
                   }}
                 >
-                  Enviar →
+                  {isSubmitting ? "Enviando…" : "Enviar →"}
                 </button>
               )}
             </div>

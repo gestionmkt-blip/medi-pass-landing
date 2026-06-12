@@ -26,7 +26,7 @@ if (!jsEntry) {
   process.exit(1);
 }
 
-const base = "/medi-pass-landing/";
+const base = "/";
 
 const html = `<!DOCTYPE html>
 <html lang="es">
