@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Reveal } from "@/components/medipass/Reveal";
 import { submitLeadFn, parseColaboradores, mapSalud } from "@/lib/actions/submitLead";
@@ -82,17 +82,23 @@ const CALL_EXPECTATIONS = [
 
 function MediPassLanding() {
   const [submitted, setSubmitted] = useState(false);
+  const [leadData, setLeadData] = useState<{ nombre: string; correo: string } | null>(null);
 
   return (
     <div id="top" className="min-h-screen" style={{ background: BG_DARK }}>
       <main>
         {submitted ? (
-          <ThankYou />
+          <ThankYou leadData={leadData} />
         ) : (
           <>
             <HeroSection />
             <FaqSection />
-            <QuizSection onSubmit={() => setSubmitted(true)} />
+            <QuizSection
+              onSubmit={(data) => {
+                setLeadData(data);
+                setSubmitted(true);
+              }}
+            />
             <TrustSignals />
           </>
         )}
@@ -191,8 +197,34 @@ function HeroSection() {
   );
 }
 
-function ThankYou() {
+function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } | null }) {
   const [checked, setChecked] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+  const calendlyUrl = (() => {
+    try {
+      const base = new URL(CALENDLY_URL);
+      if (leadData?.nombre) base.searchParams.set("name", leadData.nombre);
+      if (leadData?.correo) base.searchParams.set("email", leadData.correo);
+      return base.toString();
+    } catch {
+      return CALENDLY_URL;
+    }
+  })();
+
+  useEffect(() => {
+    if (!showCalendar) return;
+    if (!document.querySelector('script[src*="assets.calendly.com"]')) {
+      const s = document.createElement("script");
+      s.src = "https://assets.calendly.com/assets/external/widget.js";
+      s.async = true;
+      document.head.appendChild(s);
+    }
+    setTimeout(() => {
+      calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 120);
+  }, [showCalendar]);
 
   return (
     <section className="px-5 py-12" style={{ background: BG_DARK }}>
@@ -319,15 +351,14 @@ function ThankYou() {
         {/* Botón Calendly — deshabilitado hasta que el checkbox esté palomeado */}
         <Reveal delay={380}>
           {checked ? (
-            <a
-              href={CALENDLY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => setShowCalendar(true)}
               className="mt-4 block w-full rounded-full py-4 text-center text-base font-black text-white transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(234,107,72,0.35)]"
               style={{ background: CORAL }}
             >
               Agendar mi llamada →
-            </a>
+            </button>
           ) : (
             <button
               type="button"
@@ -344,6 +375,19 @@ function ThankYou() {
               : "Confirma el recuadro de arriba para continuar"}
           </p>
         </Reveal>
+
+        {showCalendar && (
+          <>
+            <style>{`.mp-calendly{height:700px}@media(max-width:639px){.mp-calendly{height:1000px}}`}</style>
+            <div ref={calendarRef} className="mt-6 overflow-hidden rounded-xl">
+              <div
+                className="calendly-inline-widget mp-calendly w-full"
+                data-url={calendlyUrl}
+                style={{ minWidth: "320px" }}
+              />
+            </div>
+          </>
+        )}
 
         <Reveal delay={440}>
           <hr className="my-6" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
@@ -613,7 +657,7 @@ function ContactStep({
   );
 }
 
-function QuizSection({ onSubmit }: { onSubmit: () => void }) {
+function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: string }) => void }) {
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1);
   const [answers, setAnswers] = useState<QuizAnswers>({
@@ -677,13 +721,7 @@ function QuizSection({ onSubmit }: { onSubmit: () => void }) {
         },
       });
 
-      onSubmit(); // muestra pantalla ThankYou mientras redirige
-
-      // TODO: reemplazar CALENDLY_URL con la URL real de tu Calendly antes de publicar
-      const target = new URL(CALENDLY_URL);
-      target.searchParams.set("name", answers.nombre.trim());
-      target.searchParams.set("email", answers.correo.trim());
-      window.location.href = target.toString();
+      onSubmit({ nombre: answers.nombre.trim(), correo: answers.correo.trim() });
     } catch {
       toast.error("No pudimos guardar tus datos, intenta de nuevo.");
     } finally {
