@@ -92,13 +92,13 @@ function MediPassLanding() {
         ) : (
           <>
             <HeroSection />
-            <FaqSection />
             <QuizSection
               onSubmit={(data) => {
                 setLeadData(data);
                 setSubmitted(true);
               }}
             />
+            <FaqSection />
             <TrustSignals />
           </>
         )}
@@ -732,31 +732,9 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
   const slideClass = direction === 1 ? "quiz-slide-right" : "quiz-slide-left";
 
   return (
-    <section id="formulario" className="px-5 py-10" style={{ background: QUIZ_BG }}>
+    <section id="formulario" className="px-5 pb-10 pt-0" style={{ background: BG_DARK }}>
       <div className="mx-auto max-w-lg">
         <Reveal>
-          <span
-            className="mb-2 inline-block text-xs font-bold uppercase tracking-widest"
-            style={{ color: CORAL }}
-          >
-            Cotización gratuita
-          </span>
-        </Reveal>
-        <Reveal delay={80}>
-          <h2
-            className="font-black tracking-tight"
-            style={{ fontSize: "clamp(22px, 5vw, 28px)", color: FAQ_TITLE }}
-          >
-            Solicita tu propuesta personalizada
-          </h2>
-        </Reveal>
-        <Reveal delay={120}>
-          <p className="mt-2 mb-6 text-sm leading-relaxed" style={{ color: FAQ_TEXT }}>
-            Sin costo ni compromiso. Un asesor te contacta en menos de 24 hrs.
-          </p>
-        </Reveal>
-
-        <Reveal delay={180}>
           <div
             className="overflow-hidden rounded-2xl p-6"
             style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)" }}
@@ -830,7 +808,7 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
               )}
             </div>
           </div>
-          <p className="mt-3 text-center text-xs" style={{ color: FAQ_TEXT }}>
+          <p className="mt-3 text-center text-xs" style={{ color: TEXT_MUTED }}>
             Sin spam. Solo te contactamos para enviarte tu propuesta.
           </p>
         </Reveal>
