@@ -1,9 +1,11 @@
+import { useEffect, useRef } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -103,6 +105,28 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        {/* Meta Pixel */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window,document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init','2180083942783887');
+              fbq('track','PageView');
+            `,
+          }}
+        />
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2180083942783887&ev=PageView&noscript=1" />`,
+          }}
+        />
       </head>
       <body>
         {children}
@@ -112,11 +136,30 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+function MetaPixelTracker() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isFirst = useRef(true);
+
+  useEffect(() => {
+    // La primera PageView ya la dispara el snippet de init
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
+    if (typeof window !== "undefined" && (window as any).fbq) {
+      (window as any).fbq("track", "PageView");
+    }
+  }, [pathname]);
+
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <MetaPixelTracker />
       <Outlet />
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
