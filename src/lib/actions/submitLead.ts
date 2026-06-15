@@ -7,7 +7,7 @@ const leadSchema = z.object({
   correo: z.string().email("Correo inválido"),
   whatsapp: z.string().optional(),
   ciudad: z.string().optional(),
-  colaboradores: z.number().optional(),
+  colaboradores: z.string().optional(), // rango raw, e.g. "20 – 50"
   seguroActual: z.string().optional(),
 });
 
@@ -21,19 +21,12 @@ export async function submitLeadFn({ data }: { data: LeadInput }): Promise<{ suc
   });
 
   if (!response.ok) {
+    const errorText = await response.text().catch(() => "(no body)");
+    console.error("[submitLeadFn] Error:", response.status, errorText);
     throw new Error("Error al guardar tus datos");
   }
 
   return response.json() as Promise<{ success: boolean }>;
-}
-
-/** Parsea el rango de colaboradores al límite inferior numérico.
- *  "1 – 10" → 1 | "11 – 30" → 11 | "31 – 100" → 31 | "100+" → 100
- */
-export function parseColaboradores(val: string): number | undefined {
-  if (!val) return undefined;
-  const n = parseInt(val.replace(/\s*[–+].*$/, ""), 10);
-  return isNaN(n) ? undefined : n;
 }
 
 /** Mapea las opciones del quiz al valor select de Notion: "Sí" | "No" | "No sé" */

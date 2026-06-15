@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Reveal } from "@/components/medipass/Reveal";
-import { submitLeadFn, parseColaboradores, mapSalud } from "@/lib/actions/submitLead";
+import { submitLeadFn, mapSalud } from "@/lib/actions/submitLead";
 
 export const Route = createFileRoute("/")({
   component: MediPassLanding,
@@ -716,7 +716,7 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
           puesto: answers.rol || undefined,
           correo: answers.correo.trim(),
           whatsapp: answers.whatsapp.trim() || undefined,
-          colaboradores: parseColaboradores(answers.colaboradores),
+          colaboradores: answers.colaboradores || undefined,
           seguroActual: mapSalud(answers.salud),
         },
       });

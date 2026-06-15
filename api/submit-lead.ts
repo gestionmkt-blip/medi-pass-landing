@@ -2,14 +2,15 @@ import { z } from "zod";
 
 export const config = { runtime: "edge" };
 
+// Database ID esperado: 3646eeb28f1c802a9c34e3d3276b7d56
 const leadSchema = z.object({
-  empresa: z.string().min(1),
+  empresa: z.string().optional(),
   contacto: z.string().optional(),
   puesto: z.string().optional(),
-  correo: z.string().email(),
+  correo: z.string().email().optional(),
   whatsapp: z.string().optional(),
   ciudad: z.string().optional(),
-  colaboradores: z.number().optional(),
+  colaboradores: z.string().optional(), // rango raw, e.g. "20 – 50"
   seguroActual: z.string().optional(),
 });
 
@@ -18,6 +19,13 @@ const json = (body: unknown, status = 200) =>
     status,
     headers: { "Content-Type": "application/json" },
   });
+
+// Convierte "20 – 50" → 20, "150 – 250" → 150, etc.
+function rangeToNumber(val: string | undefined): number | undefined {
+  if (!val) return undefined;
+  const n = parseInt(val.replace(/\s*[–\-].*$/, ""), 10);
+  return isNaN(n) ? undefined : n;
+}
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
@@ -30,7 +38,10 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const parsed = leadSchema.safeParse(body);
-  if (!parsed.success) return json({ error: "Datos inválidos" }, 422);
+  if (!parsed.success) {
+    console.error("[submit-lead] Validación fallida:", JSON.stringify(parsed.error));
+    return json({ error: "Datos inválidos" }, 422);
+  }
 
   const { empresa, contacto, puesto, correo, whatsapp, ciudad, colaboradores, seguroActual } =
     parsed.data;
@@ -43,20 +54,43 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: "Server config error" }, 500);
   }
 
+  // Empresa (title) no puede ir vacío en Notion
+  const empresaFinal = empresa?.trim() || contacto?.trim() || "Sin empresa";
+
   const properties: Record<string, unknown> = {
-    Empresa: { title: [{ text: { content: empresa } }] },
+    Empresa: { title: [{ text: { content: empresaFinal } }] },
     Etapa: { select: { name: "Nuevo lead" } },
     Fuente: { select: { name: "Landing MediPass" } },
     "Primer Contacto": { date: { start: new Date().toISOString().split("T")[0] } },
   };
 
-  if (contacto) properties["Contacto"] = { rich_text: [{ text: { content: contacto } }] };
-  if (puesto) properties["Puesto"] = { rich_text: [{ text: { content: puesto } }] };
-  if (correo) properties["Correo"] = { email: correo };
-  if (whatsapp) properties["WhatsApp"] = { phone_number: whatsapp };
-  if (ciudad) properties["Ciudad"] = { rich_text: [{ text: { content: ciudad } }] };
-  if (colaboradores !== undefined) properties["# Colaboradores"] = { number: colaboradores };
-  if (seguroActual) properties["Seguro actual"] = { select: { name: seguroActual } };
+  if (contacto?.trim())
+    properties["Contacto"] = { rich_text: [{ text: { content: contacto.trim() } }] };
+
+  if (correo?.trim())
+    properties["Correo"] = { email: correo.trim() };
+
+  if (whatsapp?.trim())
+    properties["WhatsApp"] = { phone_number: whatsapp.trim() };
+
+  if (ciudad?.trim())
+    properties["Ciudad"] = { rich_text: [{ text: { content: ciudad.trim() } }] };
+
+  if (puesto?.trim())
+    properties["Puesto"] = { rich_text: [{ text: { content: puesto.trim() } }] };
+
+  const colaboradoresNum = rangeToNumber(colaboradores);
+  if (colaboradoresNum !== undefined)
+    properties["# Colaboradores"] = { number: colaboradoresNum };
+
+  if (seguroActual)
+    properties["Seguro actual"] = { select: { name: seguroActual } };
+
+  // Guardar rango original en Notas
+  if (colaboradores)
+    properties["Notas"] = {
+      rich_text: [{ text: { content: `Rango seleccionado: ${colaboradores}` } }],
+    };
 
   const res = await fetch("https://api.notion.com/v1/pages", {
     method: "POST",
@@ -69,7 +103,8 @@ export default async function handler(req: Request): Promise<Response> {
   });
 
   if (!res.ok) {
-    console.error("[submit-lead] Notion API error:", res.status, await res.text());
+    const errorBody = await res.text();
+    console.error("[submit-lead] Notion API error:", res.status, errorBody);
     return json({ error: "Error al guardar en Notion" }, 502);
   }
 
