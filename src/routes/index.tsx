@@ -44,7 +44,7 @@ const QUIZ_STEPS = [
   {
     key: "colaboradores" as const,
     question: "¿Cuántos colaboradores tiene tu empresa?",
-    options: ["1 – 10", "11 – 30", "31 – 100", "100+"] as const,
+    options: ["1 – 20", "20 – 50", "50 – 150", "150 – 250"] as const,
     grid: true,
   },
   {
