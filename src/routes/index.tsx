@@ -27,8 +27,7 @@ const FAQ_BG = "#DBECEB";
 const FAQ_TITLE = "#1B5157";
 const FAQ_TEXT = "#3d6b70";
 const QUIZ_BG = "#f5fafa";
-// TODO deploy-blocker: reemplazar con URL real antes de publicar
-const CALENDLY_URL = "https://calendly.com/TU_LINK_AQUI";
+const CALENDLY_URL = "https://calendly.com/hola-medipass/45min";
 
 type QuizAnswers = {
   colaboradores: string;
