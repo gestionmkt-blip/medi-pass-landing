@@ -9,7 +9,7 @@ export const HERO = {
   headlineAccent: "sin pagar un seguro caro",
   subheadline:
     "Mira el video y descubre cómo más de 1,000 colaboradores ya tienen respaldo médico desde $450 al año.",
-  formDisclaimer: "Sin spam. Solo te contactamos para enviarte tu propuesta.",
+  formDisclaimer: "Sin spam. Solo te contactamos para coordinar tu llamada.",
 } as const;
 
 // ── Barra de atención (arriba del video) ─────────────────────────────────
@@ -25,7 +25,7 @@ export const VSL = {
 // ── Puente "Siguiente paso" (entre video y cuestionario) ─────────────────
 export const NEXT_STEP_BRIDGE = {
   labelAccent: "Siguiente paso:",
-  text: "responde unas preguntas y arma la propuesta de salud para tu equipo en menos de 30 segundos.",
+  text: "responde unas preguntas y aparta tu llamada con un asesor de MediPass.",
 } as const;
 
 // ── Cómo funciona ─────────────────────────────────────────────────────────
