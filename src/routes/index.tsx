@@ -81,12 +81,30 @@ const CALL_EXPECTATIONS = [
 
 function MediPassLanding() {
   const [submitted, setSubmitted] = useState(false);
+  const [scheduled, setScheduled] = useState(false);
   const [leadData, setLeadData] = useState<{ nombre: string; correo: string } | null>(null);
+
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.event === "calendly.event_scheduled") {
+        setTimeout(() => {
+          setScheduled(true);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }, 5000);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const view = scheduled ? "scheduled" : submitted ? "thankyou" : "form";
 
   return (
     <div id="top" className="min-h-screen" style={{ background: BG_DARK }}>
       <main>
-        {submitted ? (
+        {view === "scheduled" ? (
+          <ScheduledConfirmation />
+        ) : view === "thankyou" ? (
           <ThankYou leadData={leadData} />
         ) : (
           <>
@@ -196,12 +214,87 @@ function HeroSection() {
   );
 }
 
+function ScheduledConfirmation() {
+  return (
+    <>
+      <section className="px-5 pb-8 pt-10 text-center" style={{ background: BG_DARK }}>
+        <div className="mx-auto max-w-xl">
+          <Reveal>
+            <div className="mb-4 text-5xl" aria-hidden="true">🙌</div>
+          </Reveal>
+          <Reveal delay={80}>
+            <h1
+              className="font-black leading-tight tracking-tight text-white"
+              style={{ fontSize: "clamp(26px, 7vw, 40px)" }}
+            >
+              ¡Gracias por agendar{" "}
+              <span style={{ color: CORAL }}>tu llamada!</span>
+            </h1>
+          </Reveal>
+          <Reveal delay={160}>
+            <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
+              En breve recibirás una invitación en tu correo con todos los detalles.
+              Nuestro equipo estará listo para atenderte puntualmente.
+            </p>
+          </Reveal>
+          <Reveal delay={240}>
+            <div
+              className="mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold"
+              style={{ background: CORAL, color: "white" }}
+            >
+              Cita confirmada
+            </div>
+          </Reveal>
+
+          <Reveal delay={320}>
+            <p className="mx-auto mt-8 max-w-sm text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
+              Mientras tanto, mira este video para que llegues preparado a la llamada.
+            </p>
+          </Reveal>
+
+          <Reveal delay={400}>
+            <div className="mx-auto mt-7">
+              <div
+                className="relative w-full overflow-hidden rounded-xl"
+                style={{ aspectRatio: "16/9", background: VSL_BG, border: `1px solid ${VSL_BORDER}` }}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div
+                    className="flex h-16 w-16 items-center justify-center rounded-full"
+                    style={{
+                      background: CORAL,
+                      boxShadow: "0 0 0 16px rgba(234,107,72,0.12)",
+                    }}
+                  >
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="white"
+                      aria-hidden="true"
+                      focusable="false"
+                      style={{ marginLeft: "3px" }}
+                    >
+                      <polygon points="5,3 19,12 5,21" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-2 text-xs" style={{ color: "#555" }}>
+                ⏱ Video de 3 minutos — míralo completo antes de tu llamada
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+    </>
+  );
+}
+
 function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } | null }) {
   const [checked, setChecked] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  const [scheduled, setScheduled] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
-  const thankYouRef = useRef<HTMLDivElement>(null);
 
   const calendlyUrl = (() => {
     try {
@@ -226,21 +319,6 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
       calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 120);
   }, [showCalendar]);
-
-  useEffect(() => {
-    const handler = (e: MessageEvent) => {
-      if (e.data?.event === "calendly.event_scheduled") {
-        setTimeout(() => {
-          setScheduled(true);
-          setTimeout(() => {
-            thankYouRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }, 80);
-        }, 5000);
-      }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, []);
 
   return (
     <section className="px-5 py-12" style={{ background: BG_DARK }}>
@@ -403,31 +481,6 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
               />
             </div>
           </>
-        )}
-
-        {scheduled && (
-          <div
-            ref={thankYouRef}
-            className="mt-8 rounded-2xl p-8 text-center"
-            style={{ background: "rgba(234,107,72,0.08)", border: "1px solid rgba(234,107,72,0.25)" }}
-          >
-            <div className="mb-4 text-5xl" aria-hidden="true">🙌</div>
-            <h3
-              className="font-black leading-tight text-white"
-              style={{ fontSize: "clamp(20px, 5vw, 26px)" }}
-            >
-              ¡Gracias por agendar tu llamada!
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
-              En breve recibirás una invitación en tu correo con todos los detalles. Nuestro equipo estará listo para atenderte puntualmente.
-            </p>
-            <div
-              className="mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold"
-              style={{ background: CORAL, color: "white" }}
-            >
-              ✅ Cita confirmada
-            </div>
-          </div>
         )}
 
         <Reveal delay={440}>
