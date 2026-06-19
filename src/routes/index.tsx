@@ -199,7 +199,9 @@ function HeroSection() {
 function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } | null }) {
   const [checked, setChecked] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [scheduled, setScheduled] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const thankYouRef = useRef<HTMLDivElement>(null);
 
   const calendlyUrl = (() => {
     try {
@@ -224,6 +226,21 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
       calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 120);
   }, [showCalendar]);
+
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.event === "calendly.event_scheduled") {
+        setTimeout(() => {
+          setScheduled(true);
+          setTimeout(() => {
+            thankYouRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 80);
+        }, 5000);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
 
   return (
     <section className="px-5 py-12" style={{ background: BG_DARK }}>
@@ -386,6 +403,31 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
               />
             </div>
           </>
+        )}
+
+        {scheduled && (
+          <div
+            ref={thankYouRef}
+            className="mt-8 rounded-2xl p-8 text-center"
+            style={{ background: "rgba(234,107,72,0.08)", border: "1px solid rgba(234,107,72,0.25)" }}
+          >
+            <div className="mb-4 text-5xl" aria-hidden="true">🙌</div>
+            <h3
+              className="font-black leading-tight text-white"
+              style={{ fontSize: "clamp(20px, 5vw, 26px)" }}
+            >
+              ¡Gracias por agendar tu llamada!
+            </h3>
+            <p className="mt-3 text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
+              En breve recibirás una invitación en tu correo con todos los detalles. Nuestro equipo estará listo para atenderte puntualmente.
+            </p>
+            <div
+              className="mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold"
+              style={{ background: CORAL, color: "white" }}
+            >
+              ✅ Cita confirmada
+            </div>
+          </div>
         )}
 
         <Reveal delay={440}>
