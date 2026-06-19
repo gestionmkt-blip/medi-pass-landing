@@ -3,6 +3,16 @@ import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Reveal } from "@/components/medipass/Reveal";
 import { submitLeadFn, mapSalud } from "@/lib/actions/submitLead";
+import {
+  CALENDLY_URL,
+  HERO,
+  ATTENTION_BAR,
+  VSL,
+  NEXT_STEP_BRIDGE,
+  CALL_EXPECTATIONS as CALL_EXPECTATIONS_CONTENT,
+  TRUST_SIGNALS,
+  FAQS as FAQS_CONTENT,
+} from "@/lib/content";
 
 export const Route = createFileRoute("/")({
   component: MediPassLanding,
@@ -26,8 +36,6 @@ const VSL_BORDER = "#2a2a2a";
 const FAQ_BG = "#DBECEB";
 const FAQ_TITLE = "#1B5157";
 const FAQ_TEXT = "#3d6b70";
-const QUIZ_BG = "#f5fafa";
-const CALENDLY_URL = "https://calendly.com/hola-medipass/45min";
 
 type QuizAnswers = {
   colaboradores: string;
@@ -73,11 +81,7 @@ const QUIZ_STEPS = [
 type SelectionStepConfig = (typeof QUIZ_STEPS)[number];
 
 
-const CALL_EXPECTATIONS = [
-  "Entender el tamaño y necesidades de tu equipo",
-  "Explicarte qué plan se adapta mejor a tu empresa",
-  "Enviarte una propuesta con precio exacto al terminar",
-] as const;
+const CALL_EXPECTATIONS = CALL_EXPECTATIONS_CONTENT;
 
 function MediPassLanding() {
   const [submitted, setSubmitted] = useState(false);
@@ -109,6 +113,8 @@ function MediPassLanding() {
         ) : (
           <>
             <HeroSection />
+            <PuenteSiguientePaso />
+            {/* TODO: tracking — evento "quiz_start" al renderizar el primer paso */}
             <QuizSection
               onSubmit={(data) => {
                 setLeadData(data);
@@ -116,7 +122,7 @@ function MediPassLanding() {
               }}
             />
             <FaqSection />
-            <TrustSignals />
+            <TrustSignalsSection />
           </>
         )}
       </main>
@@ -125,89 +131,110 @@ function MediPassLanding() {
   );
 }
 
-// ── Componentes (se definen en tareas siguientes) ──────────────────────────
-function Nav() {
-  return (
-    <header
-      className="sticky top-0 z-40"
-      style={{ background: BG_DARK, borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-    >
-      <div className="mx-auto flex h-16 max-w-2xl items-center justify-between px-5">
-        <a href="#top" aria-label="MediPass inicio">
-          <img
-            src={`${import.meta.env.BASE_URL}medipass-logo.png`}
-            alt="MediPass"
-            style={{ height: 30 }}
-          />
-        </a>
-        <button
-          onClick={() =>
-            document.getElementById("formulario")?.scrollIntoView({ behavior: "smooth" })
-          }
-          type="button"
-          className="rounded-full px-5 py-2.5 text-sm font-bold text-white transition-transform hover:opacity-90 active:scale-95"
-          style={{ background: CORAL }}
-        >
-          Cotización gratis
-        </button>
-      </div>
-    </header>
-  );
-}
 function HeroSection() {
   return (
     <section className="px-5 pb-8 pt-10 text-center" style={{ background: BG_DARK }}>
       <div className="mx-auto max-w-xl">
         <Reveal delay={80}>
           <h1
-            className="mt-5 font-black leading-tight tracking-tight text-white"
+            className="font-black leading-tight tracking-tight text-white"
             style={{ fontSize: "clamp(26px, 7vw, 40px)" }}
           >
-            Protege la salud de tu equipo{" "}
-            <span style={{ color: CORAL }}>sin pagar un seguro caro</span>
+            {HERO.headlinePart1}
+            <span style={{ color: CORAL }}>{HERO.headlineAccent}</span>
           </h1>
         </Reveal>
 
         <Reveal delay={160}>
           <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
-            Mira el video y descubre cómo más de 1,000 colaboradores ya tienen respaldo médico
-            desde $450 al año.
+            {HERO.subheadline}
           </p>
         </Reveal>
 
         <Reveal delay={240}>
-          <div className="mx-auto mt-7">
-            {/* VSL placeholder — reemplazar con <iframe> de YouTube/Vimeo cuando esté listo */}
-            <div
-              className="relative w-full overflow-hidden rounded-xl"
-              style={{ aspectRatio: "16/9", background: VSL_BG, border: `1px solid ${VSL_BORDER}` }}
+          <BarraAtencion />
+        </Reveal>
+
+        <Reveal delay={320}>
+          <HeroVideo disclaimer={VSL.disclaimer} />
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function BarraAtencion() {
+  return (
+    <div
+      className="mx-auto mt-7 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5"
+      style={{ background: CORAL }}
+    >
+      <span className="text-xs font-black uppercase tracking-wider text-white">
+        ▶ {ATTENTION_BAR.text}
+      </span>
+    </div>
+  );
+}
+
+function HeroVideo({ disclaimer }: { disclaimer: string }) {
+  return (
+    <div className="mx-auto mt-3">
+      {/* TODO: reemplazar placeholder con <iframe> de YouTube/Vimeo cuando esté listo */}
+      {/* TODO: tracking — evento "video_play" al hacer clic en play */}
+      <div
+        className="relative w-full overflow-hidden rounded-xl"
+        style={{ aspectRatio: "16/9", background: VSL_BG, border: `1px solid ${VSL_BORDER}` }}
+      >
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="flex h-16 w-16 items-center justify-center rounded-full"
+            style={{
+              background: CORAL,
+              boxShadow: "0 0 0 16px rgba(234,107,72,0.12)",
+            }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="white"
+              aria-hidden="true"
+              focusable="false"
+              style={{ marginLeft: "3px" }}
             >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div
-                  className="flex h-16 w-16 items-center justify-center rounded-full"
-                  style={{
-                    background: CORAL,
-                    boxShadow: "0 0 0 16px rgba(234,107,72,0.12)",
-                  }}
-                >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="white"
-                    aria-hidden="true"
-                    focusable="false"
-                    style={{ marginLeft: "3px" }}
-                  >
-                    <polygon points="5,3 19,12 5,21" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-            <p className="mt-2 text-xs" style={{ color: "#555" }}>
-              ⏱ Video de 3 minutos — míralo completo antes de cotizar
-            </p>
+              <polygon points="5,3 19,12 5,21" />
+            </svg>
           </div>
+        </div>
+      </div>
+      <p className="mt-2 text-xs" style={{ color: "#555" }}>
+        ⏱ {disclaimer}
+      </p>
+    </div>
+  );
+}
+
+function PuenteSiguientePaso() {
+  return (
+    <section className="px-5 pb-2 pt-8 text-center" style={{ background: BG_DARK }}>
+      <div className="mx-auto max-w-lg">
+        <Reveal>
+          <p
+            className="font-bold leading-snug text-white"
+            style={{ fontSize: "clamp(16px, 4vw, 20px)" }}
+          >
+            <span
+              style={{
+                color: CORAL,
+                textDecoration: "underline",
+                textUnderlineOffset: "4px",
+                textDecorationThickness: "2px",
+              }}
+            >
+              {NEXT_STEP_BRIDGE.labelAccent}
+            </span>{" "}
+            {NEXT_STEP_BRIDGE.text}
+          </p>
         </Reveal>
       </div>
     </section>
@@ -216,78 +243,46 @@ function HeroSection() {
 
 function ScheduledConfirmation() {
   return (
-    <>
-      <section className="px-5 pb-8 pt-10 text-center" style={{ background: BG_DARK }}>
-        <div className="mx-auto max-w-xl">
-          <Reveal>
-            <div className="mb-4 text-5xl" aria-hidden="true">🙌</div>
-          </Reveal>
-          <Reveal delay={80}>
-            <h1
-              className="font-black leading-tight tracking-tight text-white"
-              style={{ fontSize: "clamp(26px, 7vw, 40px)" }}
-            >
-              ¡Gracias por agendar{" "}
-              <span style={{ color: CORAL }}>tu llamada!</span>
-            </h1>
-          </Reveal>
-          <Reveal delay={160}>
-            <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
-              En breve recibirás una invitación en tu correo con todos los detalles.
-              Nuestro equipo estará listo para atenderte puntualmente.
-            </p>
-          </Reveal>
-          <Reveal delay={240}>
-            <div
-              className="mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold"
-              style={{ background: CORAL, color: "white" }}
-            >
-              Cita confirmada
-            </div>
-          </Reveal>
+    <section className="px-5 pb-8 pt-10 text-center" style={{ background: BG_DARK }}>
+      <div className="mx-auto max-w-xl">
+        <Reveal>
+          <div className="mb-4 text-5xl" aria-hidden="true">🙌</div>
+        </Reveal>
+        <Reveal delay={80}>
+          <h1
+            className="font-black leading-tight tracking-tight text-white"
+            style={{ fontSize: "clamp(26px, 7vw, 40px)" }}
+          >
+            ¡Gracias por agendar{" "}
+            <span style={{ color: CORAL }}>tu llamada!</span>
+          </h1>
+        </Reveal>
+        <Reveal delay={160}>
+          <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
+            En breve recibirás una invitación en tu correo con todos los detalles.
+            Nuestro equipo estará listo para atenderte puntualmente.
+          </p>
+        </Reveal>
+        <Reveal delay={240}>
+          <div
+            className="mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold"
+            style={{ background: CORAL, color: "white" }}
+          >
+            Cita confirmada
+          </div>
+        </Reveal>
 
-          <Reveal delay={320}>
-            <p className="mx-auto mt-8 max-w-sm text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
-              Mientras tanto, mira este video para que llegues preparado a la llamada.
-            </p>
-          </Reveal>
+        <Reveal delay={320}>
+          <p className="mx-auto mt-8 max-w-sm text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
+            Mientras tanto, mira este video para que llegues preparado a la llamada.
+          </p>
+        </Reveal>
 
-          <Reveal delay={400}>
-            <div className="mx-auto mt-7">
-              <div
-                className="relative w-full overflow-hidden rounded-xl"
-                style={{ aspectRatio: "16/9", background: VSL_BG, border: `1px solid ${VSL_BORDER}` }}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div
-                    className="flex h-16 w-16 items-center justify-center rounded-full"
-                    style={{
-                      background: CORAL,
-                      boxShadow: "0 0 0 16px rgba(234,107,72,0.12)",
-                    }}
-                  >
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="white"
-                      aria-hidden="true"
-                      focusable="false"
-                      style={{ marginLeft: "3px" }}
-                    >
-                      <polygon points="5,3 19,12 5,21" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <p className="mt-2 text-xs" style={{ color: "#555" }}>
-                ⏱ Video de 3 minutos — míralo completo antes de tu llamada
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-    </>
+        <Reveal delay={400}>
+          <HeroVideo disclaimer={VSL.disclaimerScheduled} />
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
@@ -493,85 +488,6 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
     </section>
   );
 }
-const FAQS = [
-  {
-    q: "¿MediPass sustituye al IMSS o a un seguro de gastos médicos mayores?",
-    a: "No, y no pretende hacerlo. MediPass es una membresía de salud que da a tu equipo acceso inmediato a orientación médica, atención a domicilio y descuentos, todos los días y no solo en emergencias. Funciona perfecto como complemento del IMSS y como la alternativa accesible cuando un seguro de gastos médicos mayores está fuera de presupuesto.",
-  },
-  {
-    q: "¿En qué se diferencia de un seguro de gastos médicos mayores?",
-    a: "Un seguro de gastos médicos mayores cubre hospitalizaciones y cirugías grandes, y puede costar más de $15,000 al año por persona. MediPass cubre lo cotidiano —orientación médica 24/7, médico a domicilio, ambulancia, nutrición, apoyo emocional y descuentos— desde $450 al año por colaborador. No compite con el seguro: lo vuelve costeable dar un beneficio de salud cuando el seguro no lo es.",
-  },
-  {
-    q: "¿Puedo contratarlo aunque mi empresa sea pequeña o mediana?",
-    a: "Sí. MediPass está pensado para empresas que quieren dar un beneficio de salud real sin montar una estructura médica interna. El mínimo es de 20 colaboradores.",
-  },
-  {
-    q: "¿Cuánto cuesta?",
-    a: "Los planes van desde $450 MXN al año por colaborador (Plus Individual) hasta $1,760 al año por familia (Pro Familiar, con cobertura para hasta 8 personas). Armamos la cotización según el plan y el número de colaboradores que quieras integrar.",
-  },
-  {
-    q: "¿Es deducible para mi empresa?",
-    a: "Al ser una prestación para tus colaboradores, normalmente se registra como gasto deducible y te entregamos factura. Te recomendamos confirmarlo con tu contador según el régimen de tu empresa.",
-  },
-  {
-    q: "¿Mis colaboradores también pueden incluir a su familia?",
-    a: "Sí, con los planes Familiar. Cubren hasta 8 integrantes de la familia del colaborador. También hay planes individuales si prefieres empezar solo con el equipo.",
-  },
-  {
-    q: "¿Qué pasa si tengo colaboradores en distintas ciudades?",
-    a: "La orientación médica, nutricional y emocional es telefónica y funciona en todo el país. Los servicios presenciales —médico a domicilio, ambulancia, dental— dependen de la red disponible en cada zona; lo confirmamos contigo al cotizar según las ciudades donde tengas equipo.",
-  },
-  {
-    q: "¿Cómo se activa el beneficio para mis colaboradores?",
-    a: "Asignamos las membresías y cada colaborador recibe sus datos de acceso. A partir de ahí usa los servicios directamente por app, teléfono o contact center, sin trámites con la empresa de por medio.",
-  },
-  {
-    q: "¿Quién le explica al colaborador cómo usarlo?",
-    a: "Nosotros. Te entregamos los materiales de comunicación y la orientación para que tu equipo sepa exactamente cuándo y cómo pedir cada servicio. Tú no tienes que capacitar a nadie.",
-  },
-  {
-    q: "¿Mis empleados tienen que pagar cada vez que lo usan?",
-    a: "No para lo esencial. Desde el primer día tienen sin costo: orientación médica telefónica 24/7, una ambulancia terrestre, una consulta médica a domicilio, orientación nutricional y contención emocional. Otros servicios (consultas subsecuentes, dental, laboratorios) se ofrecen a precio preferencial, muy por debajo del costo particular.",
-  },
-  {
-    q: "¿La empresa tiene que gestionar las citas o los servicios?",
-    a: "No. El colaborador solicita la atención por su cuenta a través de los canales indicados. La empresa no administra citas ni hace de intermediario.",
-  },
-  {
-    q: "¿Puedo contratarlo solo para ciertos empleados o tiene que ser para toda la empresa?",
-    a: "Lo defines tú. Puedes integrar al beneficio a los colaboradores que quieras, siempre que se cumpla el mínimo de 20.",
-  },
-  {
-    q: "¿Qué pasa si un colaborador deja la empresa?",
-    a: "Nos avisas y ajustamos las membresías en la siguiente renovación. La administración es sencilla y no implica trámites complicados para tu equipo de RH.",
-  },
-  {
-    q: "¿En cuánto tiempo pueden empezar a usarlo?",
-    a: "En cuanto activamos las membresías. Los servicios sin costo —como la orientación médica 24/7— quedan disponibles desde ese mismo momento.",
-  },
-  {
-    q: "¿Qué beneficio real nota mi empresa?",
-    a: "Ofreces un respaldo de salud práctico y valorado por el equipo, a un costo que sí cabe en el presupuesto. Es una prestación que se usa en el día a día —orientación, prevención, atención a domicilio— no una póliza que nadie toca hasta una emergencia.",
-  },
-  {
-    q: "¿Ayuda a reducir ausentismo o mejorar la productividad?",
-    a: "Contribuye al bienestar del equipo al darles acceso rápido a atención sin tener que faltar al trabajo para resolver un tema de salud. El impacto real depende del uso, y por eso te apoyamos con la comunicación para que el equipo lo aproveche.",
-  },
-  {
-    q: "¿Sirve para temas de bienestar emocional o NOM-035?",
-    a: "Incluye orientación emocional y apoyo al bienestar laboral, que suman a un entorno más sano. No sustituye una auditoría, diagnóstico ni el cumplimiento legal formal de la NOM-035, pero es un buen complemento de tu estrategia de bienestar.",
-  },
-  {
-    q: "¿Y si mis colaboradores casi no lo usan?",
-    a: "Por eso te entregamos los materiales y recordatorios para impulsar el uso desde el inicio. Aun así, el costo es tan accesible (desde $450 al año) que ofrecerlo ya posiciona a tu empresa como una que cuida a su gente, se use mucho o poco.",
-  },
-  {
-    q: '¿Por qué pagar por esto si muchos empleados "nunca se enferman"?',
-    a: "Porque no es solo para enfermarse. Sirve cada vez que alguien necesita una orientación médica de noche, una consulta a domicilio, apoyo emocional, una limpieza dental o un descuento en medicinas —para ellos y su familia—. Es respaldo cotidiano, no solo un plan de emergencia.",
-  },
-];
-
 function FaqSection() {
   const [open, setOpen] = useState<number | null>(null);
 
@@ -588,7 +504,7 @@ function FaqSection() {
         </Reveal>
 
         <div className="space-y-2">
-          {FAQS.map((faq, i) => (
+          {FAQS_CONTENT.map((faq, i) => (
             <Reveal key={i} delay={i * 60}>
               <div
                 className="overflow-hidden rounded-xl"
@@ -903,7 +819,7 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
             </div>
           </div>
           <p className="mt-3 text-center text-xs" style={{ color: TEXT_MUTED }}>
-            Sin spam. Solo te contactamos para enviarte tu propuesta.
+            {HERO.formDisclaimer}
           </p>
         </Reveal>
       </div>
@@ -911,17 +827,11 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
   );
 }
 
-function TrustSignals() {
-  const items = [
-    "Cobertura nacional",
-    "Activación en 48 hrs",
-    "Sin permanencia",
-  ] as const;
-
+function TrustSignalsSection() {
   return (
     <section className="px-5 py-6" style={{ background: "#f7f7f7", borderTop: "1px solid #ececec" }}>
       <div className="mx-auto flex max-w-lg flex-wrap justify-center gap-x-6 gap-y-2">
-        {items.map((item) => (
+        {TRUST_SIGNALS.map((item) => (
           <span key={item} className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: "#555" }}>
             <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: CORAL }} />
             {item}
