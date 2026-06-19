@@ -14,12 +14,11 @@ export const HERO = {
 
 // ── Barra de atención (arriba del video) ─────────────────────────────────
 export const ATTENTION_BAR = {
-  text: "MIRA ESTE VIDEO ANTES DE COTIZAR",
+  text: "DALE CLICK PARA VER ESTE VIDEO",
 } as const;
 
 // ── Video / VSL ──────────────────────────────────────────────────────────
 export const VSL = {
-  disclaimer: "Video de 3 minutos — míralo completo antes de cotizar",
   disclaimerScheduled: "Video de 3 minutos — míralo completo antes de tu llamada",
 } as const;
 

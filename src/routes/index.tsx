@@ -156,7 +156,7 @@ function HeroSection() {
         </Reveal>
 
         <Reveal delay={320}>
-          <HeroVideo disclaimer={VSL.disclaimer} />
+          <HeroVideo />
         </Reveal>
       </div>
     </section>
@@ -176,7 +176,7 @@ function BarraAtencion() {
   );
 }
 
-function HeroVideo({ disclaimer }: { disclaimer: string }) {
+function HeroVideo({ disclaimer }: { disclaimer?: string }) {
   return (
     <div className="mx-auto mt-3">
       {/* TODO: reemplazar placeholder con <iframe> de YouTube/Vimeo cuando esté listo */}
@@ -207,9 +207,11 @@ function HeroVideo({ disclaimer }: { disclaimer: string }) {
           </div>
         </div>
       </div>
-      <p className="mt-2 text-xs" style={{ color: "#555" }}>
-        ⏱ {disclaimer}
-      </p>
+      {disclaimer && (
+        <p className="mt-2 text-xs" style={{ color: "#555" }}>
+          ⏱ {disclaimer}
+        </p>
+      )}
     </div>
   );
 }
