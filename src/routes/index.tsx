@@ -90,7 +90,7 @@ function MediPassLanding() {
         setTimeout(() => {
           setScheduled(true);
           window.scrollTo({ top: 0, behavior: "smooth" });
-        }, 5000);
+        }, 10000);
       }
     };
     window.addEventListener("message", handler);
