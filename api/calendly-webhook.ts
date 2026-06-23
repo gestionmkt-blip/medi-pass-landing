@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+export const config = { runtime: "edge" };
 
 const PREFIX = "[calendly-webhook]";
 
@@ -8,7 +8,30 @@ const json = (body: unknown, status = 200) =>
     headers: { "Content-Type": "application/json" },
   });
 
-function verifySignature(rawBody: string, header: string, secret: string): boolean {
+function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+async function verifySignature(rawBody: string, header: string, secret: string): Promise<boolean> {
   const parts = header.split(",");
   const tPart = parts.find((p) => p.startsWith("t="));
   const v1Part = parts.find((p) => p.startsWith("v1="));
@@ -17,16 +40,19 @@ function verifySignature(rawBody: string, header: string, secret: string): boole
   const timestamp = tPart.slice(2);
   const expectedSig = v1Part.slice(3);
 
-  const computed = createHmac("sha256", secret)
-    .update(`${timestamp}.${rawBody}`)
-    .digest("hex");
-
-  if (computed.length !== expectedSig.length) return false;
-
-  return timingSafeEqual(
-    Buffer.from(computed, "hex"),
-    Buffer.from(expectedSig, "hex"),
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
   );
+
+  const signed = await crypto.subtle.sign("HMAC", key, encoder.encode(`${timestamp}.${rawBody}`));
+  const computed = bytesToHex(new Uint8Array(signed));
+
+  return timingSafeEqual(computed, expectedSig);
 }
 
 export default async function handler(req: Request): Promise<Response> {
@@ -46,7 +72,7 @@ export default async function handler(req: Request): Promise<Response> {
 
   const rawBody = await req.text();
 
-  if (!verifySignature(rawBody, sigHeader, signingKey)) {
+  if (!(await verifySignature(rawBody, sigHeader, signingKey))) {
     console.error(PREFIX, "Firma inválida");
     return json({ error: "Unauthorized" }, 401);
   }
