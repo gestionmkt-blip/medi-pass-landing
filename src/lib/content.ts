@@ -8,7 +8,7 @@ export const HERO = {
   headlinePart1: "Protege la salud de tu equipo ",
   headlineAccent: "sin pagar un seguro caro",
   subheadline:
-    "Mira el video y descubre cómo más de 1,000 colaboradores ya tienen respaldo médico desde $450 al año.",
+    "Mira cómo funciona MediPass para una empresa como la tuya: salud y respaldo para tu equipo, fácil de implementar y a bajo costo por colaborador.",
   formDisclaimer: "Sin spam. Solo te contactamos para coordinar tu llamada.",
 } as const;
 
