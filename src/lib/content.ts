@@ -14,7 +14,7 @@ export const HERO = {
 
 // ── Barra de atención (arriba del video) ─────────────────────────────────
 export const ATTENTION_BAR = {
-  text: "DALE CLICK PARA VER ESTE VIDEO",
+  text: "REPRODUCE ESTE VIDEO ANTES DE CONTINUAR",
 } as const;
 
 // ── Video / VSL ──────────────────────────────────────────────────────────
