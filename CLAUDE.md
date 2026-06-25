@@ -33,8 +33,22 @@ Landing page para conseguir clientes B2B (empresas) para MediPass.
 
 ## Integración con Notion
 - Archivo: `api/submit-lead.ts`
-- Variables de entorno necesarias en Vercel: `NOTION_TOKEN` y `NOTION_DATABASE_ID`
+- Variables de entorno necesarias en Vercel: `NOTION_TOKEN`, `NOTION_DATABASE_ID`, y `CALENDLY_WEBHOOK_SIGNING_KEY`
 - Campos que se llenan automáticamente: Etapa="Nuevo lead", Fuente="Landing MediPass", Primer Contacto=fecha de hoy
+- `.env` local ya configurado con credenciales reales (jun 2025)
+- Pruebas de envío a Notion ya funcionando correctamente
+
+## Integración con Calendly
+- Archivo: `api/calendly-webhook.ts`
+- Escucha eventos `invitee.created` y `invitee.canceled`
+- Al agendar: actualiza lead en Notion a "Discovery agendado"
+- Al cancelar: actualiza a "Cita cancelada" y agrega nota
+- Requiere `CALENDLY_WEBHOOK_SIGNING_KEY` en variables de entorno
+
+## Variables de entorno requeridas
+- `NOTION_TOKEN` — token de integración de Notion
+- `NOTION_DATABASE_ID` — ID de la base de datos CRM B2B (`3646eeb28f1c80d19c50df0fe52f2fc0`)
+- `CALENDLY_WEBHOOK_SIGNING_KEY` — llave de firma del webhook de Calendly
 
 ## Pendientes conocidos
 - Reemplazar el placeholder de `CALENDLY_URL` en `src/routes/index.tsx` línea 29
