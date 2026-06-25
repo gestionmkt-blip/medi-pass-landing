@@ -50,6 +50,14 @@ Landing page para conseguir clientes B2B (empresas) para MediPass.
 - `NOTION_DATABASE_ID` — ID de la base de datos CRM B2B (`3646eeb28f1c80d19c50df0fe52f2fc0`)
 - `CALENDLY_WEBHOOK_SIGNING_KEY` — llave de firma del webhook de Calendly
 
+## VSL (Video Sales Letter)
+- Actualmente embebido desde YouTube: `https://www.youtube.com/watch?v=dDkPlIWy11I`
+- Componente: `HeroVideo` en `src/routes/index.tsx`
+- El embed de YouTube no permite ocultar el título, canal ni logo (YouTube eliminó esa opción en 2018)
+- Decisión: quedarse en YouTube por ahora y migrar a Bunny Stream cuando se quiera player completamente limpio
+- Bunny Stream es la opción elegida para migración futura: sin branding, autoplay, ~$0.10–1/mes para tráfico B2B
+- Al migrar: reemplazar el `<iframe>` de YouTube por el embed de Bunny Stream en `HeroVideo`
+
 ## Pendientes conocidos
 - Reemplazar el placeholder de `CALENDLY_URL` en `src/routes/index.tsx` línea 29
 
