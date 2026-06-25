@@ -179,33 +179,18 @@ function BarraAtencion() {
 function HeroVideo({ disclaimer }: { disclaimer?: string }) {
   return (
     <div className="mx-auto mt-3">
-      {/* TODO: reemplazar placeholder con <iframe> de YouTube/Vimeo cuando esté listo */}
-      {/* TODO: tracking — evento "video_play" al hacer clic en play */}
       <div
         className="relative w-full overflow-hidden rounded-xl"
-        style={{ aspectRatio: "16/9", background: VSL_BG, border: `1px solid ${VSL_BORDER}` }}
+        style={{ aspectRatio: "16/9", border: `1px solid ${VSL_BORDER}` }}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-full"
-            style={{
-              background: CORAL,
-              boxShadow: "0 0 0 16px rgba(234,107,72,0.12)",
-            }}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="white"
-              aria-hidden="true"
-              focusable="false"
-              style={{ marginLeft: "3px" }}
-            >
-              <polygon points="5,3 19,12 5,21" />
-            </svg>
-          </div>
-        </div>
+        <iframe
+          src="https://www.youtube.com/embed/Hs3yx1mS0p4?rel=0&modestbranding=1"
+          title="MediPass — Video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 h-full w-full"
+          style={{ border: 0 }}
+        />
       </div>
       {disclaimer && (
         <p className="mt-2 text-xs" style={{ color: "#555" }}>
