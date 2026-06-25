@@ -306,20 +306,17 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
     <section className="px-5 py-12" style={{ background: BG_DARK }}>
       <div className="mx-auto max-w-lg text-center">
         <Reveal>
-          <div className="mb-4 text-5xl" aria-hidden="true">🎉</div>
-        </Reveal>
         <Reveal delay={80}>
           <h2
             className="font-black leading-tight text-white"
             style={{ fontSize: "clamp(22px, 5vw, 28px)" }}
           >
-            ¡Listo! Ya recibimos tu solicitud
+            ¡Ya casi terminas!
           </h2>
         </Reveal>
         <Reveal delay={140}>
           <p className="mt-3 text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
-            El siguiente paso es agendar una llamada de 20 minutos con un miembro de nuestro
-            equipo.
+            El siguiente paso es agendar una llamada con un miembro de nuestro equipo.
           </p>
         </Reveal>
 
@@ -373,7 +370,7 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
                 border: "1px solid rgba(234,107,72,0.25)",
               }}
             >
-              📅 Llamada de 20 minutos · Gratis · Sin compromiso
+              📅 Llamada · Gratis · Sin compromiso
             </span>
           </div>
         </Reveal>
