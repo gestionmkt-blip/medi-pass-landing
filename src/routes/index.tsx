@@ -713,6 +713,9 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
         },
       });
 
+      if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq("track", "Lead");
+      }
       onSubmit({ nombre: answers.nombre.trim(), correo: answers.correo.trim() });
     } catch {
       toast.error("No pudimos guardar tus datos, intenta de nuevo.");
