@@ -305,7 +305,6 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
   return (
     <section className="px-5 py-12" style={{ background: BG_DARK }}>
       <div className="mx-auto max-w-lg text-center">
-        <Reveal>
         <Reveal delay={80}>
           <h2
             className="font-black leading-tight text-white"
