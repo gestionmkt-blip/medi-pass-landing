@@ -157,7 +157,7 @@ export const TRUST_SIGNALS = [
 export const FAQS = [
   {
     q: "¿MediPass sustituye al IMSS o a un seguro de gastos médicos mayores?",
-    a: "No, y no pretende hacerlo. MediPass es una membresía de salud que da a tu equipo acceso inmediato a orientación médica, atención a domicilio y descuentos, todos los días y no solo en emergencias. Funciona perfecto como complemento del IMSS y como la alternativa accesible cuando un seguro de gastos médicos mayores está fuera de presupuesto.",
+    a: "MediPass es una membresía de salud que da a tu equipo acceso inmediato a orientación médica, atención a domicilio y descuentos, todos los días y no solo en emergencias. Funciona perfecto como complemento del IMSS y como la alternativa accesible cuando un seguro de gastos médicos mayores está fuera de presupuesto.",
   },
   {
     q: "¿En qué se diferencia de un seguro de gastos médicos mayores?",
@@ -193,7 +193,7 @@ export const FAQS = [
   },
   {
     q: "¿Qué pasa si tengo colaboradores en distintas ciudades?",
-    a: "La orientación médica, nutricional y emocional es telefónica y funciona en todo el país. Los servicios presenciales —médico a domicilio, ambulancia, dental— dependen de la red disponible en cada zona; lo confirmamos contigo al cotizar.",
+    a: "No hay ningún problema. MediPass puede utilizarse en todas las ciudades de la República Mexicana, por lo que tus colaboradores podrán acceder a los servicios incluidos sin importar en qué ciudad se encuentren.",
   },
   {
     q: "¿Cómo se activa el beneficio para mis colaboradores?",
@@ -206,10 +206,6 @@ export const FAQS = [
   {
     q: "¿Sirve para equipos pequeños de menos de 50 personas?",
     a: "Sí. Trabajamos con empresas desde 20 colaboradores. No necesitas tener cientos de empleados para dar un beneficio de salud profesional.",
-  },
-  {
-    q: "¿Complementa al IMSS?",
-    a: "Perfectamente. El IMSS cubre atención médica formal con sus tiempos y procesos. MediPass cubre lo cotidiano: la orientación inmediata de noche, la consulta a domicilio cuando alguien no puede moverse, el descuento en medicinas. Los dos juntos dan una cobertura mucho más completa.",
   },
   {
     q: "¿Es deducible para mi empresa?",
