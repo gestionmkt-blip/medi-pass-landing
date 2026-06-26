@@ -310,12 +310,12 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
             className="font-black leading-tight text-white"
             style={{ fontSize: "clamp(22px, 5vw, 28px)" }}
           >
-            ¡Ya casi terminas!
+            ¡Ya casi terminas{leadData?.nombre ? `, ${leadData.nombre.split(" ")[0]}` : ""}!
           </h2>
         </Reveal>
         <Reveal delay={140}>
           <p className="mt-3 text-sm leading-relaxed" style={{ color: TEXT_MUTED }}>
-            El siguiente paso es agendar una llamada con un miembro de nuestro equipo.
+            El siguiente paso es agendar una sesión de diagnóstico sin costo.
           </p>
         </Reveal>
 
@@ -414,8 +414,7 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
               onChange={(e) => setChecked(e.target.checked)}
             />
             <span className="text-xs leading-relaxed" style={{ color: "#bbb" }}>
-              Confirmo que soy responsable de tomar o proponer decisiones de beneficios en mi
-              empresa, y que quiero recibir una propuesta real para mis colaboradores.
+              Confirmo que puedo tomar o proponer decisiones de beneficios en mi empresa.
             </span>
           </label>
         </Reveal>
