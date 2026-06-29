@@ -184,7 +184,7 @@ function HeroVideo({ disclaimer }: { disclaimer?: string }) {
         style={{ aspectRatio: "16/9", border: `1px solid ${VSL_BORDER}` }}
       >
         <iframe
-          src="https://www.youtube.com/embed/dDkPlIWy11I?rel=0&modestbranding=1"
+          src="https://www.youtube.com/embed/dDkPlIWy11I?rel=0&modestbranding=1&autoplay=1&mute=1"
           title="MediPass — Video"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
