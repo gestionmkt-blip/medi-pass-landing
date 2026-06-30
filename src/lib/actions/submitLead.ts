@@ -9,6 +9,7 @@ const leadSchema = z.object({
   ciudad: z.string().optional(),
   colaboradores: z.string().optional(), // rango raw, e.g. "20 – 50"
   seguroActual: z.string().optional(),
+  eventID: z.string().optional(),
 });
 
 type LeadInput = z.infer<typeof leadSchema>;

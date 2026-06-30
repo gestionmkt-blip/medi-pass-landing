@@ -711,6 +711,8 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
 
     setIsSubmitting(true);
     try {
+      const eventID = `lead_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
       await submitLeadFn({
         data: {
           empresa: answers.empresa.trim(),
@@ -720,11 +722,12 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
           whatsapp: answers.whatsapp.trim() || undefined,
           colaboradores: answers.colaboradores || undefined,
           seguroActual: mapSalud(answers.salud),
+          eventID,
         },
       });
 
       if (typeof window !== "undefined" && (window as any).fbq) {
-        (window as any).fbq("track", "Lead");
+        (window as any).fbq("track", "Lead", {}, { eventID });
       }
       onSubmit({ nombre: answers.nombre.trim(), correo: answers.correo.trim() });
     } catch {

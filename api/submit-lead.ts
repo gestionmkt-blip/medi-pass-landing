@@ -12,13 +12,77 @@ const leadSchema = z.object({
   ciudad: z.string().optional(),
   colaboradores: z.string().optional(), // rango raw, e.g. "20 – 50"
   seguroActual: z.string().optional(),
+  eventID: z.string().optional(),
 });
+
+const PREFIX = "[submit-lead]";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
     headers: { "Content-Type": "application/json" },
   });
+
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function sha256Hex(value: string): Promise<string> {
+  const data = new TextEncoder().encode(value.trim().toLowerCase());
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return bytesToHex(new Uint8Array(hashBuffer));
+}
+
+async function sendCapiLead(params: {
+  correo: string;
+  whatsapp: string | undefined;
+  eventID: string | undefined;
+  sourceUrl: string;
+}): Promise<void> {
+  const pixelId = process.env.META_PIXEL_ID?.trim();
+  const accessToken = process.env.META_ACCESS_TOKEN?.trim();
+  if (!pixelId || !accessToken) {
+    console.log(PREFIX, "CAPI: META_PIXEL_ID o META_ACCESS_TOKEN no configurados, omitiendo");
+    return;
+  }
+
+  const userData: Record<string, string[]> = {
+    em: [await sha256Hex(params.correo)],
+  };
+  if (params.whatsapp) {
+    userData.ph = [await sha256Hex(params.whatsapp)];
+  }
+
+  const capiEventID =
+    params.eventID ?? `lead_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+  const res = await fetch(`https://graph.facebook.com/v21.0/${pixelId}/events`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      data: [
+        {
+          event_name: "Lead",
+          event_time: Math.floor(Date.now() / 1000),
+          event_id: capiEventID,
+          action_source: "website",
+          event_source_url: params.sourceUrl,
+          user_data: userData,
+        },
+      ],
+      access_token: accessToken,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error(PREFIX, "CAPI: error enviando Lead:", res.status, errText);
+  } else {
+    console.log(PREFIX, `CAPI: Lead enviado — eventID: ${capiEventID}, status: ${res.status}`);
+  }
+}
 
 // Convierte "20 – 50" → 20, "150 – 250" → 150, etc.
 function rangeToNumber(val: string | undefined): number | undefined {
@@ -39,18 +103,18 @@ export default async function handler(req: Request): Promise<Response> {
 
   const parsed = leadSchema.safeParse(body);
   if (!parsed.success) {
-    console.error("[submit-lead] Validación fallida:", JSON.stringify(parsed.error));
+    console.error(PREFIX, "Validación fallida:", JSON.stringify(parsed.error));
     return json({ error: "Datos inválidos" }, 422);
   }
 
-  const { empresa, contacto, puesto, correo, whatsapp, ciudad, colaboradores, seguroActual } =
+  const { empresa, contacto, puesto, correo, whatsapp, ciudad, colaboradores, seguroActual, eventID } =
     parsed.data;
 
   const token = process.env.NOTION_TOKEN;
   const dbId = process.env.NOTION_DATABASE_ID;
 
   if (!token || !dbId) {
-    console.error("[submit-lead] Faltan NOTION_TOKEN o NOTION_DATABASE_ID");
+    console.error(PREFIX, "Faltan NOTION_TOKEN o NOTION_DATABASE_ID");
     return json({ error: "Server config error" }, 500);
   }
 
@@ -104,8 +168,21 @@ export default async function handler(req: Request): Promise<Response> {
 
   if (!res.ok) {
     const errorBody = await res.text();
-    console.error("[submit-lead] Notion API error:", res.status, errorBody);
+    console.error(PREFIX, "Notion API error:", res.status, errorBody);
     return json({ error: "Error al guardar en Notion" }, 502);
+  }
+
+  if (correo?.trim()) {
+    try {
+      await sendCapiLead({
+        correo: correo.trim(),
+        whatsapp: whatsapp?.trim() || undefined,
+        eventID,
+        sourceUrl: req.headers.get("referer") ?? "https://medipass.mx",
+      });
+    } catch (err) {
+      console.error(PREFIX, "CAPI: excepción:", err);
+    }
   }
 
   return json({ success: true });
