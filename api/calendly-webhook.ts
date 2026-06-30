@@ -117,6 +117,60 @@ function formatDateMX(isoDate: string): string {
   }
 }
 
+async function sha256Hex(value: string): Promise<string> {
+  const data = new TextEncoder().encode(value.trim().toLowerCase());
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return bytesToHex(new Uint8Array(hashBuffer));
+}
+
+async function sendCapiSchedule(
+  email: string,
+  eventUri: string | undefined,
+  startTime: string | undefined,
+): Promise<void> {
+  const pixelId = process.env.META_PIXEL_ID;
+  const accessToken = process.env.META_ACCESS_TOKEN;
+  if (!pixelId || !accessToken) {
+    console.log(PREFIX, "CAPI: META_PIXEL_ID o META_ACCESS_TOKEN no configurados, omitiendo");
+    return;
+  }
+
+  const eventID = eventUri
+    ? `sched_${eventUri.split("/").pop()}`
+    : `sched_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+  const eventTime = startTime
+    ? Math.floor(new Date(startTime).getTime() / 1000)
+    : Math.floor(Date.now() / 1000);
+
+  const res = await fetch(
+    `https://graph.facebook.com/v21.0/${pixelId}/events`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: [
+          {
+            event_name: "Schedule",
+            event_time: eventTime,
+            event_id: eventID,
+            action_source: "website",
+            user_data: { em: [await sha256Hex(email)] },
+          },
+        ],
+        access_token: accessToken,
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error(PREFIX, "CAPI: error enviando Schedule:", res.status, errText);
+  } else {
+    console.log(PREFIX, `CAPI: Schedule enviado — eventID: ${eventID}`);
+  }
+}
+
 async function handleCreated(
   payload: any,
   notionHeaders: Record<string, string>,
@@ -125,6 +179,7 @@ async function handleCreated(
   const inviteeEmail: string | undefined = payload.payload?.email;
   const inviteeName: string | undefined = payload.payload?.name;
   const startTime: string | undefined = payload.payload?.scheduled_event?.start_time;
+  const eventUri: string | undefined = payload.payload?.scheduled_event?.uri;
 
   if (!inviteeEmail) {
     console.error(PREFIX, "created: no se encontró correo en el payload");
@@ -132,6 +187,12 @@ async function handleCreated(
   }
 
   console.log(PREFIX, `created: ${inviteeName} <${inviteeEmail}>`);
+
+  try {
+    await sendCapiSchedule(inviteeEmail, eventUri, startTime);
+  } catch (err) {
+    console.error(PREFIX, "CAPI: excepción:", err);
+  }
 
   let lead: LeadResult | null;
   try {

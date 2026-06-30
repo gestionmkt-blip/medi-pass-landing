@@ -91,6 +91,16 @@ function MediPassLanding() {
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data?.event === "calendly.event_scheduled") {
+        // Derivamos el eventID del URI del evento de Calendly para poder deduplicar con CAPI
+        const eventUri: string | undefined = e.data?.payload?.event?.uri;
+        const eventID = eventUri
+          ? `sched_${eventUri.split("/").pop()}`
+          : `sched_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+        if (typeof window !== "undefined" && (window as any).fbq) {
+          (window as any).fbq("track", "Schedule", {}, { eventID });
+        }
+
         setTimeout(() => {
           setScheduled(true);
           window.scrollTo({ top: 0, behavior: "smooth" });

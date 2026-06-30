@@ -51,6 +51,8 @@ Landing page para conseguir clientes B2B (empresas) para MediPass.
 - `NOTION_TOKEN` — token de integración de Notion
 - `NOTION_DATABASE_ID` — ID de la base de datos CRM B2B (`3646eeb28f1c80d19c50df0fe52f2fc0`)
 - `CALENDLY_WEBHOOK_SIGNING_KEY` — llave de firma del webhook de Calendly
+- `META_PIXEL_ID` — ID del Pixel de Meta (`2180083942783887`) — usado por CAPI en el webhook de Calendly — **ya configurado en Vercel**
+- `META_ACCESS_TOKEN` — token de acceso del sistema de Meta Marketing API — usado por CAPI en el webhook de Calendly — **ya configurado en Vercel**
 
 ## VSL (Video Sales Letter)
 - Actualmente embebido desde YouTube: `https://www.youtube.com/watch?v=dDkPlIWy11I`
