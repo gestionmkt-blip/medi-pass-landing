@@ -105,28 +105,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="es-MX">
       <head>
         <HeadContent />
-        {/* Meta Pixel */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window,document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init','2180083942783887');
-              fbq('track','PageView');
-            `,
-          }}
-        />
-        <noscript
-          dangerouslySetInnerHTML={{
-            __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2180083942783887&ev=PageView&noscript=1" />`,
-          }}
-        />
       </head>
       <body>
         {children}
@@ -138,15 +116,39 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function MetaPixelTracker() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isFirst = useRef(true);
+  const isFirstRoute = useRef(true);
 
+  // Inicializa el pixel imperativamente — dangerouslySetInnerHTML no ejecuta <script> en el browser
   useEffect(() => {
-    // La primera PageView ya la dispara el snippet de init
-    if (isFirst.current) {
-      isFirst.current = false;
+    const w = window as any;
+    if (w.fbq) return;
+
+    const n: any = (...args: any[]) => {
+      n.callMethod ? n.callMethod(...args) : n.queue.push(args);
+    };
+    n.push = n;
+    n.loaded = true;
+    n.version = "2.0";
+    n.queue = [];
+    w.fbq = n;
+    w._fbq = n;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://connect.facebook.net/en_US/fbevents.js";
+    document.head.appendChild(script);
+
+    w.fbq("init", "2180083942783887");
+    w.fbq("track", "PageView");
+  }, []);
+
+  // Re-dispara PageView en cambios de ruta (SPA); el de la carga inicial lo cubre el effect de arriba
+  useEffect(() => {
+    if (isFirstRoute.current) {
+      isFirstRoute.current = false;
       return;
     }
-    if (typeof window !== "undefined" && (window as any).fbq) {
+    if ((window as any).fbq) {
       (window as any).fbq("track", "PageView");
     }
   }, [pathname]);
