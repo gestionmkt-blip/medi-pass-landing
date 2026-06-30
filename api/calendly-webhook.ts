@@ -128,8 +128,8 @@ async function sendCapiSchedule(
   eventUri: string | undefined,
   startTime: string | undefined,
 ): Promise<void> {
-  const pixelId = process.env.META_PIXEL_ID;
-  const accessToken = process.env.META_ACCESS_TOKEN;
+  const pixelId = process.env.META_PIXEL_ID?.trim();
+  const accessToken = process.env.META_ACCESS_TOKEN?.trim();
   if (!pixelId || !accessToken) {
     console.log(PREFIX, "CAPI: META_PIXEL_ID o META_ACCESS_TOKEN no configurados, omitiendo");
     return;
