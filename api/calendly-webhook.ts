@@ -139,9 +139,8 @@ async function sendCapiSchedule(
     ? `sched_${eventUri.split("/").pop()}`
     : `sched_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
-  const eventTime = startTime
-    ? Math.floor(new Date(startTime).getTime() / 1000)
-    : Math.floor(Date.now() / 1000);
+  const eventTime = Math.floor(Date.now() / 1000);
+  const customData = startTime ? { appointment_time: startTime } : undefined;
 
   const res = await fetch(
     `https://graph.facebook.com/v21.0/${pixelId}/events`,
@@ -156,6 +155,7 @@ async function sendCapiSchedule(
             event_id: eventID,
             action_source: "website",
             user_data: { em: [await sha256Hex(email)] },
+            ...(customData && { custom_data: customData }),
           },
         ],
         access_token: accessToken,
