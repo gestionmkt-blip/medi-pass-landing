@@ -47,6 +47,13 @@ Landing page para conseguir clientes B2B (empresas) para MediPass.
 - Al cancelar: actualiza a "Cita cancelada" y agrega nota
 - Requiere `CALENDLY_WEBHOOK_SIGNING_KEY` en variables de entorno
 
+### CAPI de Meta (en calendly-webhook.ts)
+- Envía evento `Schedule` a Meta Conversions API al agendar
+- `event_time` = `Math.floor(Date.now() / 1000)` — momento del agendamiento, NO la hora de la cita
+  - Usar `start_time` como `event_time` causaba error 2804004 ("marca de tiempo posterior a la actual")
+- La hora de la cita (`start_time`) se envía en `custom_data.appointment_time`
+- `META_PIXEL_ID` y `META_ACCESS_TOKEN` se leen con `.trim()` para evitar que espacios/saltos rompan la llamada
+
 ## Variables de entorno requeridas
 - `NOTION_TOKEN` — token de integración de Notion
 - `NOTION_DATABASE_ID` — ID de la base de datos CRM B2B (`3646eeb28f1c80d19c50df0fe52f2fc0`)
@@ -79,6 +86,8 @@ vercel dev
 - Snippet base en `src/routes/__root.tsx` — dispara `PageView` al cargar
 - Evento `Lead` se dispara en `src/routes/index.tsx` al completar el formulario exitosamente
 - `lang` del HTML configurado como `es-MX`
+- El pixel se inicializa con `document.createElement('script')` en un `useEffect` (NO `dangerouslySetInnerHTML`) — el navegador sí ejecuta scripts creados así
+- Verificado en producción: `window.fbq` es función, `fbevents.js` v2.9.347 cargado, cola vacía (eventos enviados)
 
 ## Pantalla post-formulario (ThankYou)
 - Componente: `ThankYou` en `src/routes/index.tsx`
