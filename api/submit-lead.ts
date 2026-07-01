@@ -13,6 +13,8 @@ const leadSchema = z.object({
   colaboradores: z.string().optional(), // rango raw, e.g. "20 – 50"
   seguroActual: z.string().optional(),
   eventID: z.string().optional(),
+  fbp: z.string().optional(),
+  fbc: z.string().optional(),
 });
 
 const PREFIX = "[submit-lead]";
@@ -40,6 +42,8 @@ async function sendCapiLead(params: {
   whatsapp: string | undefined;
   eventID: string | undefined;
   sourceUrl: string;
+  fbp: string | undefined;
+  fbc: string | undefined;
 }): Promise<void> {
   const pixelId = process.env.META_PIXEL_ID?.trim();
   const accessToken = process.env.META_ACCESS_TOKEN?.trim();
@@ -48,15 +52,20 @@ async function sendCapiLead(params: {
     return;
   }
 
-  const userData: Record<string, string[]> = {
+  const userData: Record<string, string | string[]> = {
     em: [await sha256Hex(params.correo)],
   };
   if (params.whatsapp) {
     userData.ph = [await sha256Hex(params.whatsapp)];
   }
+  if (params.fbp) userData.fbp = params.fbp;
+  if (params.fbc) userData.fbc = params.fbc;
 
   const capiEventID =
     params.eventID ?? `lead_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+  // Temporal para pruebas en Meta Events Manager — quitar META_TEST_EVENT_CODE de Vercel cuando termine de validarse
+  const testEventCode = process.env.META_TEST_EVENT_CODE?.trim();
 
   const res = await fetch(`https://graph.facebook.com/v21.0/${pixelId}/events`, {
     method: "POST",
@@ -73,6 +82,7 @@ async function sendCapiLead(params: {
         },
       ],
       access_token: accessToken,
+      ...(testEventCode ? { test_event_code: testEventCode } : {}),
     }),
   });
 
@@ -107,7 +117,7 @@ export default async function handler(req: Request): Promise<Response> {
     return json({ error: "Datos inválidos" }, 422);
   }
 
-  const { empresa, contacto, puesto, correo, whatsapp, ciudad, colaboradores, seguroActual, eventID } =
+  const { empresa, contacto, puesto, correo, whatsapp, ciudad, colaboradores, seguroActual, eventID, fbp, fbc } =
     parsed.data;
 
   const token = process.env.NOTION_TOKEN;
@@ -179,6 +189,8 @@ export default async function handler(req: Request): Promise<Response> {
         whatsapp: whatsapp?.trim() || undefined,
         eventID,
         sourceUrl: req.headers.get("referer") ?? "https://medipass.mx",
+        fbp,
+        fbc,
       });
     } catch (err) {
       console.error(PREFIX, "CAPI: excepción:", err);

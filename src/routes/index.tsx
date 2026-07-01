@@ -83,6 +83,12 @@ type SelectionStepConfig = (typeof QUIZ_STEPS)[number];
 
 const CALL_EXPECTATIONS = CALL_EXPECTATIONS_CONTENT;
 
+function getCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie.match(new RegExp("(^|; )" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[2]) : undefined;
+}
+
 function MediPassLanding() {
   const [submitted, setSubmitted] = useState(false);
   const [scheduled, setScheduled] = useState(false);
@@ -673,6 +679,7 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof QuizAnswers, string>>>({});
+  const [inicioTrackeado, setInicioTrackeado] = useState(false);
 
   const TOTAL_STEPS = 4;
   const isSelectionStep = step < 3;
@@ -689,6 +696,12 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
         answers.whatsapp.trim().length >= 10);
 
   const goNext = () => {
+    if (!inicioTrackeado) {
+      if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq("track", "InitiateCheckout", { content_name: "Cuestionario MediPass B2B" });
+      }
+      setInicioTrackeado(true);
+    }
     setDirection(1);
     setStep((s) => s + 1);
   };
@@ -723,6 +736,8 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
           colaboradores: answers.colaboradores || undefined,
           seguroActual: mapSalud(answers.salud),
           eventID,
+          fbp: getCookie("_fbp"),
+          fbc: getCookie("_fbc"),
         },
       });
 
