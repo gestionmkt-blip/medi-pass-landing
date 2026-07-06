@@ -44,6 +44,8 @@ async function sendCapiLead(params: {
   sourceUrl: string;
   fbp: string | undefined;
   fbc: string | undefined;
+  clientIp: string | undefined;
+  userAgent: string | undefined;
 }): Promise<void> {
   const pixelId = process.env.META_PIXEL_ID?.trim();
   const accessToken = process.env.META_ACCESS_TOKEN?.trim();
@@ -60,6 +62,8 @@ async function sendCapiLead(params: {
   }
   if (params.fbp) userData.fbp = params.fbp;
   if (params.fbc) userData.fbc = params.fbc;
+  if (params.clientIp) userData.client_ip_address = params.clientIp;
+  if (params.userAgent) userData.client_user_agent = params.userAgent;
 
   const capiEventID =
     params.eventID ?? `lead_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
@@ -179,6 +183,10 @@ export default async function handler(req: Request): Promise<Response> {
   if (!res.ok) {
     const errorBody = await res.text();
     console.error(PREFIX, "Notion API error:", res.status, errorBody);
+    console.error(
+      "LEAD_FALLBACK",
+      JSON.stringify({ empresa, contacto, puesto, correo, whatsapp, ciudad, colaboradores, seguroActual, timestamp: new Date().toISOString() })
+    );
     return json({ error: "Error al guardar en Notion" }, 502);
   }
 
@@ -191,6 +199,8 @@ export default async function handler(req: Request): Promise<Response> {
         sourceUrl: req.headers.get("referer") ?? "https://medipass.mx",
         fbp,
         fbc,
+        clientIp: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
+        userAgent: req.headers.get("user-agent") ?? undefined,
       });
     } catch (err) {
       console.error(PREFIX, "CAPI: excepción:", err);

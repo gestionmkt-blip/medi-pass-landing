@@ -135,6 +135,7 @@ function MediPassLanding() {
               onSubmit={(data) => {
                 setLeadData(data);
                 setSubmitted(true);
+                window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             />
             <FaqSection />
