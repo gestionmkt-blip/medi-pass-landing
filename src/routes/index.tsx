@@ -89,6 +89,28 @@ function getCookie(name: string): string | undefined {
   return match ? decodeURIComponent(match[2]) : undefined;
 }
 
+// Se dispara desde el paso 4 del cuestionario (datos de contacto) para que el script
+// ya esté descargado cuando el usuario llegue a la pantalla de gracias.
+let calendlyScriptPromise: Promise<void> | null = null;
+function loadCalendlyScript(): Promise<void> {
+  if (typeof document === "undefined") return Promise.resolve();
+  if (calendlyScriptPromise) return calendlyScriptPromise;
+
+  if (document.querySelector('script[src*="assets.calendly.com"]')) {
+    calendlyScriptPromise = Promise.resolve();
+    return calendlyScriptPromise;
+  }
+
+  calendlyScriptPromise = new Promise((resolve) => {
+    const s = document.createElement("script");
+    s.src = "https://assets.calendly.com/assets/external/widget.js";
+    s.async = true;
+    s.onload = () => resolve();
+    document.head.appendChild(s);
+  });
+  return calendlyScriptPromise;
+}
+
 function MediPassLanding() {
   const [submitted, setSubmitted] = useState(false);
   const [scheduled, setScheduled] = useState(false);
@@ -293,7 +315,9 @@ function ScheduledConfirmation() {
 function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } | null }) {
   const [checked, setChecked] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [calendlyReady, setCalendlyReady] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
+  const calendlyTargetRef = useRef<HTMLDivElement>(null);
 
   const calendlyUrl = (() => {
     try {
@@ -306,14 +330,46 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
     }
   })();
 
+  // El widget se monta de inmediato (detrás del checkbox) para que ya esté
+  // listo cuando el usuario le dé clic a "Agendar mi llamada". El script de
+  // Calendly solo auto-inicializa divs que ya existen al momento de cargar,
+  // así que hay que llamar a su API (initInlineWidget) a mano.
+  useEffect(() => {
+    let cancelled = false;
+    loadCalendlyScript().then(() => {
+      if (cancelled || !calendlyTargetRef.current) return;
+      (window as any).Calendly?.initInlineWidget({
+        url: calendlyUrl,
+        parentElement: calendlyTargetRef.current,
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- se inicializa una sola vez al montar
+  }, []);
+
+  useEffect(() => {
+    const container = calendlyTargetRef.current;
+    if (!container) return;
+
+    if (container.querySelector("iframe")) {
+      setCalendlyReady(true);
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      if (container.querySelector("iframe")) {
+        setCalendlyReady(true);
+        observer.disconnect();
+      }
+    });
+    observer.observe(container, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     if (!showCalendar) return;
-    if (!document.querySelector('script[src*="assets.calendly.com"]')) {
-      const s = document.createElement("script");
-      s.src = "https://assets.calendly.com/assets/external/widget.js";
-      s.async = true;
-      document.head.appendChild(s);
-    }
     setTimeout(() => {
       calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 120);
@@ -464,18 +520,36 @@ function ThankYou({ leadData }: { leadData: { nombre: string; correo: string } |
           </p>
         </Reveal>
 
-        {showCalendar && (
-          <>
-            <style>{`.mp-calendly{height:700px}@media(max-width:639px){.mp-calendly{height:1000px}}`}</style>
-            <div ref={calendarRef} className="mt-6 overflow-hidden rounded-xl">
-              <div
-                className="calendly-inline-widget mp-calendly w-full"
-                data-url={calendlyUrl}
-                style={{ minWidth: "320px" }}
+        <style>{`.mp-calendly{height:700px}@media(max-width:639px){.mp-calendly{height:1000px}}`}</style>
+        <div
+          ref={calendarRef}
+          className="relative mt-6 overflow-hidden rounded-xl"
+          style={
+            showCalendar
+              ? undefined
+              : { position: "absolute", width: "1px", height: "1px", opacity: 0, overflow: "hidden", pointerEvents: "none" }
+          }
+        >
+          {/* Nunca se desmonta ni se le pone display:none — Calendly inyecta el iframe
+              aquí de inmediato al cargar; lo que se oculta hasta el clic es el contenedor
+              de arriba. React no debe tocar los hijos de este div (los maneja Calendly). */}
+          <div ref={calendlyTargetRef} className="mp-calendly w-full" style={{ minWidth: "320px" }} />
+          {showCalendar && !calendlyReady && (
+            <div
+              className="absolute inset-0 z-10 flex w-full items-center justify-center gap-2 rounded-xl"
+              style={{ background: BG_DARK, color: "#777" }}
+              role="status"
+              aria-live="polite"
+            >
+              <span
+                className="h-5 w-5 animate-spin rounded-full border-2"
+                style={{ borderColor: "rgba(255,255,255,0.15)", borderTopColor: CORAL }}
+                aria-hidden="true"
               />
+              <span className="text-xs font-medium">Cargando calendario…</span>
             </div>
-          </>
-        )}
+          )}
+        </div>
 
         <Reveal delay={440}>
           <hr className="my-6" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
@@ -686,6 +760,12 @@ function QuizSection({ onSubmit }: { onSubmit: (data: { nombre: string; correo: 
   const isSelectionStep = step < 3;
   const currentConfig = isSelectionStep ? QUIZ_STEPS[step as 0 | 1 | 2] : null;
   const currentValue = isSelectionStep ? answers[QUIZ_STEPS[step as 0 | 1 | 2].key] : "";
+
+  // Precarga el widget de Calendly desde el paso de datos de contacto para
+  // que ya esté listo cuando el usuario llegue a la pantalla de gracias.
+  useEffect(() => {
+    if (step === 3) loadCalendlyScript();
+  }, [step]);
 
   const canAdvance =
     !isSubmitting &&

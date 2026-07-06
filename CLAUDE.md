@@ -64,6 +64,17 @@ Landing page para conseguir clientes B2B (empresas) para MediPass.
 - `user_data` solo manda `em` (correo hasheado) — sin `ph`, `fbp`, `fbc`, `client_ip` ni `user_agent` (peor match quality que el evento `Lead`; el evento `Lead` sí manda `client_ip_address`/`client_user_agent` desde jul 2026)
 - No soporta `test_event_code` (a diferencia de `submit-lead.ts`)
 
+## Widget embebido de Calendly (rendimiento, jul 2026)
+- Todo vive en `ThankYou` en `src/routes/index.tsx`, más un helper `loadCalendlyScript()` a nivel de módulo (mismo archivo) que memoiza la promesa de carga del script para no inyectarlo dos veces
+- **Precarga temprana**: `QuizSection` llama a `loadCalendlyScript()` en cuanto el usuario llega al paso 4 (datos de contacto), no hasta la pantalla de gracias — así el script ya está descargado cuando se envía el formulario
+- **Montaje inmediato**: el div destino (`calendlyTargetRef`) se monta apenas renderiza `ThankYou`, oculto visualmente (contenedor padre con `position:absolute; width/height:1px; opacity:0; pointerEvents:none` — NUNCA `display:none`) hasta que el usuario palomea el checkbox y le da clic a "Agendar mi llamada"
+- **Importante — por qué no basta con el `data-url` + clase `calendly-inline-widget`**: el script de Calendly solo auto-inicializa divs con esa clase que ya existen en el DOM al momento en que el script termina de cargar (hace un escaneo único, no usa `MutationObserver`). Como el div de destino lo monta React después (al pasar a la pantalla de gracias), el auto-scan nunca lo encuentra y el iframe nunca aparece. Confirmado a mano en el navegador. La solución es llamar explícitamente a `window.Calendly.initInlineWidget({ url, parentElement })` en un `useEffect` una vez que el script cargó
+- Confirmado también que `initInlineWidget` sí funciona con el contenedor todavía oculto/diminuto (1px), por eso el truco de ocultarlo con `position:absolute` en vez de `display:none` es seguro
+- El div que recibe el iframe de Calendly (`calendlyTargetRef`) no debe tener hijos manejados por React (Calendly lo manipula con DOM directo) — el skeleton/spinner de carga se renderiza como hermano absoluto (`position:absolute; inset:0`) por encima, nunca como hijo
+- Un `MutationObserver` sobre `calendlyTargetRef` detecta cuándo aparece el `<iframe>` para saber cuándo ocultar el skeleton
+- El `data-url` con `name=`/`email=` prefilled (tomados de `leadData`) ya existía antes de esta optimización y se sigue usando, ahora pasado directamente al `url` de `initInlineWidget` en vez de al atributo `data-url`
+- `<link rel="preconnect" href="https://assets.calendly.com">` agregado en `__root.tsx`
+
 ## Auditoría Meta Pixel + CAPI (jul 2026)
 Mapa completo de todos los eventos que se mandan a Meta, dónde viven y su estado de deduplicación.
 
